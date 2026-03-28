@@ -3,44 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetChat | MagicOS Dark</title>
+    <title>NetChat | NextGen UI</title>
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+
     <style>
-        :root { --bg: #020617; --glass: rgba(255, 255, 255, 0.05); --accent: #8b5cf6; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: white; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .container { width: 90%; max-width: 400px; background: var(--glass); backdrop-filter: blur(20px); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; height: 80vh; }
-        .chat-box { flex: 1; overflow-y: auto; margin-bottom: 15px; padding: 10px; }
-        .msg { background: rgba(255,255,255,0.08); padding: 10px; border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
-        .msg b { color: #38bdf8; display: block; font-size: 11px; }
-        .input-area { display: flex; gap: 8px; }
-        input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; outline: none; }
-        .btn { padding: 12px; border-radius: 12px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
+        :root {
+            --bg: linear-gradient(160deg, #020617 0%, #1e1b4b 50%, #4c1d95 100%);
+            --glass: rgba(15, 23, 42, 0.7);
+            --accent: #a78bfa;
+            --blue: #38bdf8;
+            --text: #f1f5f9;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', sans-serif; background: var(--bg);
+            color: var(--text); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+
+        .container {
+            width: 95%; max-width: 500px; background: var(--glass); backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; height: 85vh;
+        }
+
+        /* Lang Switcher */
+        .lang-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+        .lang-btn { background: rgba(255,255,255,0.1); border: none; color: white; padding: 5px 12px; border-radius: 10px; cursor: pointer; font-size: 12px; }
+        .lang-btn.active { background: var(--blue); }
+
+        .chat-box { flex: 1; overflow-y: auto; padding-right: 10px; margin-bottom: 15px; }
+        .msg { background: rgba(255, 255, 255, 0.05); padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: slideUp 0.3s ease; }
+        .msg b { color: var(--blue); font-size: 12px; display: block; margin-bottom: 4px; }
+        .msg img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; }
+        
+        .delete-icon { position: absolute; right: 10px; top: 10px; color: #ef4444; cursor: pointer; display: none; font-size: 12px; }
+        .msg:hover .delete-icon { display: block; }
+
+        .input-area { display: flex; gap: 10px; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 20px; align-items: center; }
+        input[type="text"] { flex: 1; background: none; border: none; color: white; outline: none; padding: 5px; }
+        
+        .icon-btn { color: var(--text); font-size: 20px; cursor: pointer; transition: 0.3s; }
+        .icon-btn:hover { color: var(--blue); transform: scale(1.1); }
+
+        #auth-section { text-align: center; margin: auto; }
         #chat-section { display: none; flex-direction: column; height: 100%; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2 style="text-align:center; color: #38bdf8;">NetChat</h2>
-        
-        <div id="auth-section" style="text-align:center; margin: auto 0;">
-            <p style="color: #94a3b8;">NetGlobal Team xavfsiz chatiga xush kelibsiz</p>
-            <button class="btn" onclick="login()">Google orqali kirish</button>
+        <div class="lang-bar">
+            <button class="lang-btn" onclick="setLang('uz')">UZ</button>
+            <button class="lang-btn" onclick="setLang('en')">EN</button>
+            <button class="lang-btn" onclick="setLang('ru')">RU</button>
+        </div>
+
+        <h2 style="text-align:center; color: var(--blue); margin: 0 0 20px 0;"><i class="fas fa-paper-plane"></i> NetChat</h2>
+
+        <div id="auth-section">
+            <p id="txt-welcome">NetChat-ga xush kelibsiz!</p>
+            <button class="lang-btn" style="padding: 12px 25px; font-size: 16px; background: var(--blue);" onclick="login()" id="txt-login">Google orqali kirish</button>
         </div>
 
         <div id="chat-section">
             <div class="chat-box" id="messages"></div>
             <div class="input-area">
-                <input type="text" id="msgInput" placeholder="Xabar..." onkeypress="if(event.key==='Enter') send()">
-                <button class="btn" style="width: auto;" onclick="send()">➤</button>
+                <label for="imgUpload" class="icon-btn"><i class="fas fa-image"></i></label>
+                <input type="file" id="imgUpload" hidden accept="image/*" onchange="uploadImage(this)">
+                <input type="text" id="msgInput" placeholder="...">
+                <button class="icon-btn" style="border:none; background:none;" onclick="sendText()"><i class="fas fa-location-arrow"></i></button>
             </div>
         </div>
     </div>
 
     <script>
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBqKqszWBCMrKIjN0Wb9PxC7wArkjd5FSU",
             authDomain: "netchat-52007.firebaseapp.com",
@@ -48,45 +94,97 @@
             projectId: "netchat-52007",
             storageBucket: "netchat-52007.firebasestorage.app",
             messagingSenderId: "145404562699",
-            appId: "1:145404562699:web:5eeb4c6abc3e18675b660e",
-            measurementId: "G-YKM3J5YR9F"
+            appId: "1:145404562699:web:5eeb4c6abc3e18675b660e"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
+        const storage = firebase.storage();
 
+        // LANGUAGES
+        const langs = {
+            uz: { welcome: "Xush kelibsiz!", login: "Google orqali kirish", placeholder: "Xabar yozing...", confirm: "O'chirilsinmi?" },
+            en: { welcome: "Welcome!", login: "Sign in with Google", placeholder: "Type a message...", confirm: "Delete this?" },
+            ru: { welcome: "Добро пожаловать!", login: "Войти через Google", placeholder: "Сообщение...", confirm: "Удалить?" }
+        };
+        let currentLang = 'uz';
+
+        function setLang(l) {
+            currentLang = l;
+            document.getElementById('txt-welcome').innerText = langs[l].welcome;
+            document.getElementById('txt-login').innerText = langs[l].login;
+            document.getElementById('msgInput').placeholder = langs[l].placeholder;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        }
+
+        // AUTH
         function login() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).then((res) => {
+            auth.signInWithPopup(provider).then(res => {
                 document.getElementById('auth-section').style.display = 'none';
                 document.getElementById('chat-section').style.display = 'flex';
-                db.ref('active_users/' + res.user.uid).set({
-                    name: res.user.displayName,
-                    device: navigator.userAgent,
-                    time: new Date().toLocaleString()
+                db.ref('active_users/' + res.user.uid).update({ name: res.user.displayName, lastSeen: Date.now() });
+            });
+        }
+
+        // SEND TEXT
+        function sendText() {
+            const val = document.getElementById('msgInput').value;
+            if(val.trim() && auth.currentUser) {
+                db.ref('messages').push({
+                    uid: auth.currentUser.uid,
+                    name: auth.currentUser.displayName,
+                    text: val,
+                    time: Date.now()
+                });
+                document.getElementById('msgInput').value = "";
+            }
+        }
+
+        // UPLOAD IMAGE
+        function uploadImage(input) {
+            const file = input.files[0];
+            if(!file || !auth.currentUser) return;
+            const ref = storage.ref(`chat_images/${Date.now()}_${file.name}`);
+            ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
+                db.ref('messages').push({
+                    uid: auth.currentUser.uid,
+                    name: auth.currentUser.displayName,
+                    image: url,
+                    time: Date.now()
                 });
             });
         }
 
-        function send() {
-            const input = document.getElementById('msgInput');
-            if(input.value.trim() !== "") {
-                db.ref('messages').push({
-                    name: auth.currentUser.displayName,
-                    text: input.value,
-                    time: Date.now()
-                });
-                input.value = "";
-            }
+        // DELETE MSG
+        function delMsg(id) {
+            if(confirm(langs[currentLang].confirm)) db.ref('messages/' + id).remove();
         }
 
-        db.ref('messages').limitToLast(30).on('child_added', (snap) => {
+        // RECEIVE
+        db.ref('messages').limitToLast(40).on('child_added', snap => {
             const m = snap.val();
-            document.getElementById('messages').innerHTML += `<div class="msg"><b>${m.name}</b>${m.text}</div>`;
-            const box = document.getElementById('messages');
-            box.scrollTop = box.scrollHeight;
+            const isMine = auth.currentUser && m.uid === auth.currentUser.uid;
+            const content = m.image ? `<img src="${m.image}" onclick="window.open('${m.image}')">` : `<span>${m.text}</span>`;
+            const delBtn = isMine ? `<i class="fas fa-trash delete-icon" onclick="delMsg('${snap.key}')"></i>` : "";
+            
+            const html = `
+                <div class="msg" id="msg-${snap.key}">
+                    ${delBtn}
+                    <b>${m.name}</b>
+                    ${content}
+                </div>`;
+            document.getElementById('messages').innerHTML += html;
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         });
+
+        db.ref('messages').on('child_removed', snap => {
+            const el = document.getElementById(`msg-${snap.key}`);
+            if(el) el.remove();
+        });
+
+        setLang('uz');
     </script>
 </body>
 </html>
