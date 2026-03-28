@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetChat | Next-Gen Messenger</title>
+    <title>NetChat | Social Hybrid</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -13,117 +13,100 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
     <style>
         :root {
-            --bg: #0f172a;
-            --sidebar: #1e293b;
-            --accent: #8b5cf6;
-            --text: #f1f5f9;
-            --glass: rgba(30, 41, 59, 0.7);
+            --accent: #a855f7;
+            --bg: #020617;
+            --card: rgba(30, 41, 59, 0.7);
+            --text: #f8fafc;
+            --gradient: linear-gradient(135deg, #1e1b4b 0%, #020617 100%);
         }
 
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: var(--gradient); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
 
-        /* --- AUTH & REGISTRATION --- */
-        .modal { position: fixed; inset: 0; background: #020617; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 25px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
-        .input-style { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #334155; background: #0f172a; color: white; outline: none; box-sizing: border-box; }
-        .btn-main { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-main:hover { opacity: 0.9; transform: scale(1.02); }
+        /* --- SIDEBAR (TELEGRAM STYLE) --- */
+        .sidebar { width: 350px; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; transition: 0.4s; z-index: 1000; }
+        .side-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .user-card { padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; border-radius: 15px; margin: 5px 10px; }
+        .user-card:hover { background: rgba(168, 85, 247, 0.1); }
+        .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; border: 2px solid #0f172a; position: absolute; bottom: 0; right: 0; }
 
-        /* --- MAIN LAYOUT --- */
-        .sidebar { width: 350px; background: var(--sidebar); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
-        .main-chat { flex: 1; display: flex; flex-direction: column; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-blend-mode: overlay; position: relative; }
+        /* --- FEED/CHAT (INSTAGRAM STYLE) --- */
+        .feed-container { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.15), transparent); }
+        .feed-header { padding: 15px 25px; background: rgba(2, 6, 23, 0.5); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .posts-area { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; display: flex; flex-direction: column; align-items: center; }
 
-        /* --- MESSAGES --- */
-        .chat-display { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-        .msg { max-width: 75%; padding: 12px 16px; border-radius: 18px; position: relative; font-size: 14.5px; line-height: 1.4; animation: pop 0.3s ease; }
-        .msg.mine { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 2px; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-        .msg.theirs { align-self: flex-start; background: #334155; border-bottom-left-radius: 2px; }
-        .msg b { display: block; font-size: 11px; margin-bottom: 5px; color: #38bdf8; cursor: pointer; }
-        .msg img, .msg video { max-width: 100%; border-radius: 12px; margin-top: 8px; display: block; border: 1px solid rgba(255,255,255,0.1); }
-        
-        .del-icon { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; display: none; align-items: center; justify-content: center; cursor: pointer; border: 2px solid var(--bg); }
-        .msg:hover .del-icon { display: flex; }
+        /* POST CARD */
+        .post { width: 100%; max-width: 500px; background: var(--card); border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; animation: fadeInUp 0.5s ease; }
+        .post-head { padding: 12px 15px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
+        .post-content { width: 100%; background: #000; display: flex; justify-content: center; }
+        .post-content img, .post-content video { width: 100%; max-height: 500px; object-fit: contain; }
+        .post-info { padding: 15px; }
+        .post-text { font-size: 14px; margin-top: 8px; line-height: 1.5; opacity: 0.9; }
+        .post-actions { display: flex; gap: 15px; margin-top: 10px; font-size: 20px; color: var(--accent); }
 
         /* --- INPUT AREA --- */
-        .bottom-bar { padding: 15px 20px; background: var(--bg); display: flex; align-items: center; gap: 15px; border-top: 1px solid rgba(255,255,255,0.05); }
-        .bottom-bar input[type="text"] { flex: 1; background: rgba(255,255,255,0.05); border: none; padding: 12px 20px; border-radius: 25px; color: white; outline: none; font-size: 15px; }
-        .action-btn { font-size: 22px; color: #94a3b8; cursor: pointer; transition: 0.2s; border: none; background: none; }
-        .action-btn:hover { color: var(--accent); transform: scale(1.1); }
+        .input-wrapper { padding: 20px; display: flex; justify-content: center; }
+        .input-box { width: 100%; max-width: 600px; background: rgba(255,255,255,0.05); border-radius: 30px; display: flex; align-items: center; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .input-box input { flex: 1; background: none; border: none; color: white; padding: 12px; outline: none; }
 
-        /* --- MOBILE NAV --- */
-        .mobile-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: var(--sidebar); display: none; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); z-index: 1000; }
-        .nav-link { display: flex; flex-direction: column; align-items: center; font-size: 10px; color: #94a3b8; text-decoration: none; }
-        .nav-link.active { color: var(--accent); }
+        /* --- MOBILE --- */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(15, 23, 42, 0.95); display: none; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        @media (max-width: 768px) { .sidebar { display: none; } .bottom-nav { display: flex; } .feed-container { padding-bottom: 70px; } }
 
-        @media (max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: flex; } .main-chat { padding-bottom: 65px; } }
-        @keyframes pop { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="auth-modal" class="modal">
-        <div class="card">
-            <h2 style="color:var(--accent); margin-bottom: 10px;">NetChat</h2>
-            <p id="auth-status" style="font-size: 13px; opacity: 0.7; margin-bottom: 20px;">Xavfsiz muloqot tizimi</p>
-            
-            <div id="login-ui">
-                <button class="btn-main" onclick="startGoogleLogin()"><i class="fab fa-google"></i> Google bilan kirish</button>
+    <div id="auth-modal" class="modal" style="position:fixed; inset:0; background:#020617; z-index:9999; display:flex; align-items:center; justify-content:center;">
+        <div style="background:#1e293b; padding:40px; border-radius:30px; text-align:center; width:90%; max-width:400px; border:1px solid var(--accent);">
+            <h1 style="background:linear-gradient(to right, #a855f7, #6366f1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:40px; margin-bottom:10px;">NetChat</h1>
+            <div id="login-section">
+                <button onclick="login()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Google bilan boshlash</button>
             </div>
-
-            <div id="reg-ui" style="display:none; text-align: left;">
-                <label style="font-size: 12px; margin-left: 5px;">Username (Noyob nom):</label>
-                <input type="text" id="in-username" placeholder="@username" class="input-style">
-                <label style="font-size: 12px; margin-left: 5px;">Bio (O'zingiz haqida):</label>
-                <textarea id="in-bio" placeholder="Masalan: 8-sinf o'quvchisi" class="input-style" style="height: 80px; resize: none;"></textarea>
-                <label style="font-size: 12px; margin-left: 5px;">Aloqa (Tel yoki Telegram):</label>
-                <input type="text" id="in-phone" placeholder="+998..." class="input-style">
-                <button class="btn-main" onclick="finishRegistration()">Profilni saqlash</button>
+            <div id="reg-section" style="display:none; text-align:left; margin-top:20px;">
+                <input type="text" id="r-user" placeholder="@username" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:#0f172a; border:1px solid #334155; color:white;">
+                <textarea id="r-bio" placeholder="Bio..." style="width:100%; padding:12px; height:80px; border-radius:10px; background:#0f172a; border:1px solid #334155; color:white; resize:none;"></textarea>
+                <button onclick="saveProfile()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Profilingizni yarating</button>
             </div>
         </div>
     </div>
 
-    <div class="sidebar">
-        <div style="padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 id="my-name-display" style="margin: 0; font-size: 18px; color: var(--accent);">@username</h3>
-                <i class="fas fa-cog action-btn" style="font-size: 18px;" onclick="showMyProfile()"></i>
-            </div>
-            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-search" style="opacity: 0.4;"></i>
-                <input type="text" placeholder="Qidiruv..." style="background:none; border:none; color:white; outline:none; width: 100%;">
-            </div>
+    <aside class="sidebar">
+        <div class="side-header">
+            <h2 id="my-username" style="color:var(--accent); margin:0;">@username</h2>
+            <small style="opacity:0.5;">Global Community</small>
         </div>
-        <div id="user-contacts" style="flex: 1; overflow-y: auto;">
-            </div>
-    </div>
+        <div id="users-list" style="flex:1; overflow-y:auto; padding-top:10px;"></div>
+    </aside>
 
-    <main class="main-chat" id="chat-ui" style="display:none;">
-        <header style="padding: 15px 20px; background: var(--glass); backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center; z-index: 100;">
-            <div>
-                <b id="active-chat-name" style="display:block;">Global Chat</b>
-                <span style="font-size: 12px; color: #10b981;">● onlayn</span>
-            </div>
-            <i class="fas fa-ellipsis-v action-btn" style="font-size: 18px;"></i>
+    <main class="feed-container">
+        <header class="feed-header">
+            <h3 style="margin:0;">Global Feed</h3>
+            <i class="fas fa-paper-plane" style="font-size:20px; color:var(--accent);"></i>
         </header>
 
-        <div class="chat-display" id="msg-list"></div>
+        <div class="posts-area" id="posts-container">
+            </div>
 
-        <div class="bottom-bar">
-            <label for="media-input" class="action-btn"><i class="fas fa-paperclip"></i></label>
-            <input type="file" id="media-input" hidden onchange="processMedia(this)">
-            <input type="text" id="msg-input" placeholder="Xabar yozing..." onkeypress="if(event.key==='Enter') doSend()">
-            <button onclick="doSend()" class="action-btn" style="color: var(--accent);"><i class="fas fa-paper-plane"></i></button>
+        <div class="input-wrapper">
+            <div class="input-box">
+                <label for="media-up" style="cursor:pointer; padding:10px;"><i class="fas fa-camera" style="font-size:20px; color:var(--accent);"></i></label>
+                <input type="file" id="media-up" hidden onchange="uploadPost(this)">
+                <input type="text" id="post-text" placeholder="Nima gaplar?..." onkeypress="if(event.key==='Enter') sendText()">
+                <button onclick="sendText()" style="background:none; border:none; padding:10px;"><i class="fas fa-arrow-up" style="font-size:20px; color:var(--accent);"></i></button>
+            </div>
         </div>
     </main>
 
-    <div class="mobile-nav">
-        <div class="nav-link active"><i class="fas fa-comment"></i><span>Chatlar</span></div>
-        <div class="nav-link"><i class="fas fa-address-book"></i><span>Odamlar</span></div>
-        <div class="nav-link" onclick="showMyProfile()"><i class="fas fa-user"></i><span>Profil</span></div>
-    </div>
+    <nav class="bottom-nav">
+        <i class="fas fa-home" style="color:var(--accent); font-size:24px;"></i>
+        <i class="fas fa-search" style="font-size:24px; opacity:0.6;"></i>
+        <i class="fas fa-plus-circle" onclick="document.getElementById('media-up').click()" style="font-size:30px; color:var(--accent);"></i>
+        <i class="fas fa-heart" style="font-size:24px; opacity:0.6;"></i>
+        <i class="fas fa-user-circle" style="font-size:24px; opacity:0.6;"></i>
+    </nav>
 
     <script>
-        // --- CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBqKqszWBCMrKIjN0Wb9PxC7wArkjd5FSU",
             authDomain: "netchat-52007.firebaseapp.com",
@@ -138,146 +121,114 @@
         const auth = firebase.auth();
         const store = firebase.storage();
 
-        let myData = null;
+        let userData = null;
 
-        // --- AUTH & PROFILE ---
-        function startGoogleLogin() {
+        // AUTH
+        function login() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).then(res => {
                 db.ref('users/' + res.user.uid).once('value', snap => {
-                    if(snap.exists()) {
-                        myData = snap.val();
-                        launchApp();
-                    } else {
-                        document.getElementById('login-ui').style.display = 'none';
-                        document.getElementById('reg-ui').style.display = 'block';
-                        document.getElementById('auth-status').innerText = "Profilingizni yarating";
-                    }
+                    if(snap.exists()) { userData = snap.val(); startApp(); }
+                    else { document.getElementById('login-section').style.display='none'; document.getElementById('reg-section').style.display='block'; }
                 });
-            }).catch(e => alert("Xatolik: " + e.message));
+            });
         }
 
-        function finishRegistration() {
-            const user = auth.currentUser;
-            const uname = document.getElementById('in-username').value.trim();
-            const bio = document.getElementById('in-bio').value.trim();
-            const phone = document.getElementById('in-phone').value.trim();
-
-            if(uname.length < 3) return alert("Username kamida 3 harf bo'lsin!");
-
-            myData = {
-                uid: user.uid,
-                fullname: user.displayName,
+        function saveProfile() {
+            const u = auth.currentUser;
+            const uname = document.getElementById('r-user').value.trim();
+            if(!uname) return alert("Username kiriting!");
+            userData = {
+                uid: u.uid,
+                fullname: u.displayName,
                 username: uname.startsWith('@') ? uname : '@' + uname,
-                bio: bio || "NetChat a'zosi",
-                phone: phone || "Noma'lum",
-                pic: user.photoURL
+                bio: document.getElementById('r-bio').value || "NetChat o'quvchisi",
+                pic: u.photoURL
             };
-
-            db.ref('users/' + user.uid).set(myData).then(launchApp);
+            db.ref('users/' + u.uid).set(userData).then(startApp);
         }
 
-        function launchApp() {
+        function startApp() {
             document.getElementById('auth-modal').style.display = 'none';
-            document.getElementById('chat-ui').style.display = 'flex';
-            document.getElementById('my-name-display').innerText = myData.username;
-            initChat();
-            loadContacts();
+            document.getElementById('my-username').innerText = userData.username;
+            loadPosts();
+            loadUsers();
         }
 
-        // --- CORE CHAT FUNCTIONS ---
-        function doSend() {
-            const input = document.getElementById('msg-input');
-            if(!input.value.trim()) return;
-            pushMessage({ type: 'text', val: input.value });
-            input.value = "";
+        // POSTS
+        function sendText() {
+            const txt = document.getElementById('post-text').value;
+            if(!txt.trim()) return;
+            pushToDB({ type: 'text', content: txt });
+            document.getElementById('post-text').value = "";
         }
 
-        function processMedia(input) {
+        function uploadPost(input) {
             const file = input.files[0];
             if(!file) return;
-            const path = `chat_media/${Date.now()}_${file.name}`;
-            const ref = store.ref(path);
-            
-            ref.put(file).then(snap => snap.ref.getDownloadURL()).then(url => {
-                let mType = 'file';
-                if(file.type.startsWith('image/')) mType = 'image';
-                if(file.type.startsWith('video/')) mType = 'video';
-                pushMessage({ type: mType, val: url, name: file.name });
+            const ref = store.ref(`social/${Date.now()}_${file.name}`);
+            ref.put(file).then(s => s.ref.getDownloadURL()).then(url => {
+                let t = file.type.startsWith('image/') ? 'img' : (file.type.startsWith('video/') ? 'vid' : 'file');
+                pushToDB({ type: t, content: url, fileName: file.name });
             });
         }
 
-        function pushMessage(obj) {
-            db.ref('messages').push({
-                ...obj,
-                senderUid: myData.uid,
-                senderName: myData.username,
-                time: Date.now()
+        function pushToDB(data) {
+            db.ref('posts').push({
+                ...data, uid: userData.uid, username: userData.username, pic: userData.pic, time: Date.now()
             });
         }
 
-        function removeMsg(id) {
-            if(confirm("Xabarni o'chirib tashlaysizmi?")) db.ref('messages/' + id).remove();
-        }
-
-        function initChat() {
-            db.ref('messages').limitToLast(50).on('child_added', snap => {
-                const m = snap.val();
-                const isMine = m.senderUid === myData.uid;
-                let body = "";
-
-                if(m.type === 'text') body = `<span>${m.val}</span>`;
-                else if(m.type === 'image') body = `<img src="${m.val}" onclick="window.open('${m.val}')">`;
-                else if(m.type === 'video') body = `<video controls src="${m.val}"></video>`;
-                else body = `<a href="${m.val}" target="_blank" style="color:#38bdf8; text-decoration:none;"><i class="fas fa-file-download"></i> ${m.name}</a>`;
-
+        function loadPosts() {
+            db.ref('posts').on('child_added', snap => {
+                const p = snap.val();
+                let media = "";
+                if(p.type === 'img') media = `<div class="post-content"><img src="${p.content}"></div>`;
+                else if(p.type === 'vid') media = `<div class="post-content"><video controls src="${p.content}"></video></div>`;
+                
                 const html = `
-                    <div class="msg ${isMine ? 'mine' : 'theirs'}" id="msg-${snap.key}">
-                        ${isMine ? `<div class="del-icon" onclick="removeMsg('${snap.key}')">×</div>` : ''}
-                        <b onclick="getProfile('${m.senderUid}')">${m.senderName}</b>
-                        ${body}
-                    </div>
-                `;
-                const list = document.getElementById('msg-list');
-                list.innerHTML += html;
-                list.scrollTop = list.scrollHeight;
+                    <div class="post" id="${snap.key}">
+                        <div class="post-head">
+                            <div style="width:35px; height:35px; border-radius:50%; background:var(--accent); overflow:hidden;">
+                                <img src="${p.pic}" style="width:100%; height:100%;">
+                            </div>
+                            <span>${p.username}</span>
+                            ${p.uid === userData.uid ? `<i class="fas fa-trash" onclick="deletePost('${snap.key}')" style="margin-left:auto; opacity:0.5; cursor:pointer;"></i>` : ''}
+                        </div>
+                        ${media}
+                        <div class="post-info">
+                            <div class="post-actions"><i class="far fa-heart"></i> <i class="far fa-comment"></i> <i class="far fa-paper-plane"></i></div>
+                            <div class="post-text"><b>${p.username}</b> ${p.type === 'text' ? p.content : (p.fileName || '')}</div>
+                            <small style="opacity:0.4; font-size:10px;">${new Date(p.time).toLocaleString()}</small>
+                        </div>
+                    </div>`;
+                const container = document.getElementById('posts-container');
+                container.innerHTML = html + container.innerHTML;
             });
-
-            db.ref('messages').on('child_removed', snap => {
-                const el = document.getElementById('msg-' + snap.key);
-                if(el) el.remove();
-            });
+            db.ref('posts').on('child_removed', snap => document.getElementById(snap.key).remove());
         }
 
-        function loadContacts() {
+        function deletePost(id) { if(confirm("O'chirilsinmi?")) db.ref('posts/' + id).remove(); }
+
+        function loadUsers() {
             db.ref('users').on('value', snap => {
-                const list = document.getElementById('user-contacts');
+                const list = document.getElementById('users-list');
                 list.innerHTML = "";
-                snap.forEach(child => {
-                    const u = child.val();
-                    if(u.uid === myData.uid) return;
+                snap.forEach(c => {
+                    const u = c.val();
                     list.innerHTML += `
-                        <div onclick="getProfile('${u.uid}')" style="padding: 15px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); cursor: pointer;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold;">${u.fullname[0]}</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 14px;">${u.fullname}</div>
-                                <div style="font-size: 11px; opacity: 0.5;">${u.username}</div>
+                        <div class="user-card" onclick="alert('Bio: ${u.bio}')">
+                            <div style="position:relative; width:45px; height:45px; border-radius:50%; background:var(--accent); overflow:hidden;">
+                                <img src="${u.pic}" style="width:100%; height:100%;">
+                                <div class="online-dot"></div>
                             </div>
-                        </div>
-                    `;
+                            <div>
+                                <div style="font-weight:600;">${u.fullname}</div>
+                                <div style="font-size:12px; opacity:0.6;">${u.username}</div>
+                            </div>
+                        </div>`;
                 });
             });
-        }
-
-        function getProfile(uid) {
-            db.ref('users/' + uid).once('value', snap => {
-                const u = snap.val();
-                alert(`📌 PROFIL:\nIsm: ${u.fullname}\nUsername: ${u.username}\nBio: ${u.bio}\nAloqa: ${u.phone}`);
-            });
-        }
-
-        function showMyProfile() {
-            getProfile(myData.uid);
         }
     </script>
 </body>
