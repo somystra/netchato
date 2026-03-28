@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetChat | Next-Gen Social</title>
+    <title>NetGlobal Team | OS Experience</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -12,142 +12,183 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
     <style>
+        /* --- WINDOWS 11 & MAGIC OS VARIABLES --- */
         :root {
-            --accent: #8b5cf6;
-            --secondary: #ec4899;
-            --bg: #020617;
-            --glass: rgba(30, 41, 59, 0.6);
-            --text: #f8fafc;
+            --win-bg: linear-gradient(135deg, #020617 0%, #0f172a 40%, #2e1065 100%);
+            --acrylic: rgba(255, 255, 255, 0.03);
+            --mica: rgba(15, 23, 42, 0.4);
+            --border: 1px solid rgba(255, 255, 255, 0.08);
+            --blur: blur(30px) saturate(150%);
+            --accent: #a855f7;
+            --accent-hover: #c084fc;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --radius-lg: 24px;
+            --radius-md: 16px;
         }
 
         body { 
-            margin: 0; font-family: 'Inter', sans-serif; 
-            background: radial-gradient(circle at top right, #1e1b4b, #020617);
-            color: var(--text); height: 100vh; overflow: hidden; display: flex; 
+            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--win-bg); color: var(--text-main); 
+            height: 100vh; overflow: hidden; display: flex; justify-content: center;
         }
 
-        /* --- LEFT SIDEBAR (Telegram Style) --- */
-        .sidebar { 
-            width: 320px; background: rgba(15, 23, 42, 0.8); 
-            backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); 
-            display: flex; flex-direction: column; transition: 0.3s;
+        /* --- AUTH SCREEN (Win11 Lock Screen Style) --- */
+        .auth-overlay {
+            position: fixed; inset: 0; background: var(--win-bg); z-index: 9999;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
-        .side-head { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .contact-card { 
-            padding: 12px 15px; margin: 5px 10px; border-radius: 12px;
-            display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s;
+        .auth-card {
+            background: var(--acrylic); backdrop-filter: var(--blur);
+            border: var(--border); border-radius: var(--radius-lg);
+            padding: 40px; width: 90%; max-width: 420px; text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: zoomIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .contact-card:hover { background: rgba(139, 92, 246, 0.15); }
-        .avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+        .win-input {
+            width: 100%; padding: 14px 20px; margin: 10px 0; border-radius: var(--radius-md);
+            background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+            color: white; outline: none; transition: 0.3s; box-sizing: border-box; font-size: 15px;
+        }
+        .win-input:focus { border-color: var(--accent); background: rgba(0,0,0,0.4); }
+        .win-btn {
+            width: 100%; padding: 15px; border-radius: var(--radius-md); border: none;
+            background: var(--accent); color: white; font-weight: 600; font-size: 16px;
+            cursor: pointer; transition: 0.3s; margin-top: 15px;
+        }
+        .win-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
-        /* --- MAIN CONTENT (Instagram Style Feed) --- */
-        .main-feed { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .feed-header { 
-            padding: 15px 25px; background: rgba(2, 6, 23, 0.7); 
-            backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1); sticky: top; z-index: 100;
+        /* --- APP CONTAINER (MagicOS Floating Window) --- */
+        .app-window {
+            width: 100%; max-width: 1200px; height: 100vh;
+            display: flex; flex-direction: column; position: relative;
         }
-        .scroll-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
 
-        /* POST CARD */
-        .post-card { 
-            width: 100%; max-width: 500px; background: var(--glass); 
-            border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);
-            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        /* --- TOP HEADER (Win11 Titlebar) --- */
+        .app-header {
+            padding: 20px 30px; display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(to bottom, rgba(2,6,23,0.8), transparent); z-index: 100;
         }
-        .post-top { padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
-        .post-media { width: 100%; min-height: 300px; background: #000; display: flex; align-items: center; }
-        .post-media img, .post-media video { width: 100%; display: block; }
-        .post-bottom { padding: 15px; }
-        .actions { display: flex; gap: 18px; font-size: 22px; margin-bottom: 10px; }
-        .actions i { cursor: pointer; transition: 0.2s; }
-        .actions i:hover { color: var(--secondary); transform: scale(1.1); }
+        .brand-title { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+        .brand-title span { color: var(--accent); }
 
-        /* --- INPUT BAR --- */
-        .input-container { 
-            padding: 20px; background: linear-gradient(to top, var(--bg), transparent);
-            display: flex; justify-content: center; width: 100%; box-sizing: border-box;
+        /* --- MAIN FEED (Instagram Professional Style) --- */
+        .feed-scroll {
+            flex: 1; overflow-y: auto; padding: 0 20px 120px 20px; 
+            display: flex; flex-direction: column; align-items: center; gap: 30px;
         }
-        .glass-input { 
-            width: 100%; max-width: 600px; background: rgba(255,255,255,0.05); 
-            border-radius: 30px; display: flex; align-items: center; padding: 5px 15px; 
-            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-        }
-        .glass-input input { flex: 1; background: none; border: none; color: white; padding: 12px; outline: none; }
+        .feed-scroll::-webkit-scrollbar { display: none; }
 
-        /* --- MOBILE NAVIGATION --- */
-        .mobile-bar { 
-            position: fixed; bottom: 0; width: 100%; height: 70px; 
-            background: rgba(15, 23, 42, 0.9); display: none; justify-content: space-around; 
-            align-items: center; border-top: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px);
+        .post-widget {
+            width: 100%; max-width: 550px; background: var(--mica);
+            backdrop-filter: var(--blur); border: var(--border);
+            border-radius: var(--radius-lg); overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: fadeUp 0.6s ease;
         }
-        .nav-item { font-size: 24px; color: #94a3b8; cursor: pointer; transition: 0.3s; }
-        .nav-item.active { color: var(--accent); }
+        .post-header { padding: 15px 20px; display: flex; align-items: center; gap: 12px; }
+        .post-avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        .post-media { width: 100%; max-height: 600px; background: #000; display: flex; justify-content: center; }
+        .post-media img, .post-media video { width: 100%; height: auto; object-fit: contain; }
+        .post-body { padding: 20px; }
+        .post-actions { display: flex; gap: 20px; font-size: 24px; margin-bottom: 12px; }
+        .action-icon { cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .action-icon:hover { color: var(--accent); transform: scale(1.1); }
+        .post-caption b { font-weight: 600; margin-right: 8px; }
 
-        @media (max-width: 768px) { 
-            .sidebar { display: none; } 
-            .mobile-bar { display: flex; } 
-            .scroll-area { padding-bottom: 80px; }
+        /* --- CENTERED DOCK (Win11 / macOS Taskbar) --- */
+        .win-dock {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: var(--mica); backdrop-filter: var(--blur); border: var(--border);
+            padding: 12px 25px; border-radius: 35px; display: flex; gap: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); z-index: 1000;
         }
+        .dock-item {
+            width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: var(--text-sub); cursor: pointer; transition: 0.3s;
+        }
+        .dock-item:hover, .dock-item.active {
+            background: var(--acrylic); color: var(--accent); transform: translateY(-5px);
+        }
+        .create-btn {
+            background: var(--accent); color: white; box-shadow: 0 0 20px rgba(168,85,247,0.4);
+        }
+        .create-btn:hover { background: var(--accent-hover); color: white; }
+
+        /* --- GLASS INPUT MODAL (MagicOS Style) --- */
+        .compose-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center; z-index: 2000;
+        }
+        .compose-card {
+            background: var(--mica); border: var(--border); border-radius: var(--radius-lg);
+            width: 90%; max-width: 500px; padding: 25px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div id="auth-modal" class="modal" style="position:fixed; inset:0; background:var(--bg); z-index:10000; display:flex; align-items:center; justify-content:center;">
-        <div style="background:var(--glass); padding:40px; border-radius:30px; text-align:center; width:85%; max-width:400px; border:1px solid var(--accent); backdrop-filter:blur(20px);">
-            <h1 style="font-size:35px; margin-bottom:10px; background:linear-gradient(to right, #8b5cf6, #ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">NetChat</h1>
-            <div id="login-box">
-                <button onclick="handleAuth()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Google bilan kirish</button>
+    <div id="auth-screen" class="auth-overlay">
+        <h1 style="font-size: 45px; margin-bottom: 30px; font-weight: 300;">Xush kelibsiz</h1>
+        <div class="auth-card">
+            <h2 class="brand-title" style="margin-top:0;">Net<span>Global</span> OS</h2>
+            
+            <div id="login-ui">
+                <p style="color: var(--text-sub); margin-bottom: 25px;">Tizimga kirish uchun hisobingizni tasdiqlang</p>
+                <button class="win-btn" onclick="sysLogin()"><i class="fab fa-google"></i> Google Identity</button>
             </div>
-            <div id="setup-box" style="display:none; text-align:left; margin-top:20px;">
-                <input type="text" id="set-uname" placeholder="@username" style="width:100%; padding:12px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid #444; color:white; margin-bottom:10px;">
-                <textarea id="set-bio" placeholder="Bio (Masalan: 8-sinf o'quvchisi)" style="width:100%; padding:12px; height:80px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid #444; color:white; resize:none;"></textarea>
-                <button onclick="completeProfile()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--secondary); color:white; font-weight:bold; cursor:pointer;">Tayyor!</button>
+
+            <div id="reg-ui" style="display:none; text-align: left;">
+                <label style="font-size: 13px; color: var(--text-sub); margin-left: 10px;">Foydalanuvchi nomi</label>
+                <input type="text" id="os-user" placeholder="@username" class="win-input">
+                <label style="font-size: 13px; color: var(--text-sub); margin-left: 10px; margin-top: 10px; display:block;">Bio / Status</label>
+                <input type="text" id="os-bio" placeholder="Mingbuloq maktabi o'quvchisi" class="win-input">
+                <button class="win-btn" onclick="sysSetup()">Tizimni ishga tushirish</button>
             </div>
         </div>
     </div>
 
-    <aside class="sidebar">
-        <div class="side-head">
-            <h2 id="display-username" style="margin:0; color:var(--accent);">@username</h2>
-            <p style="font-size:12px; opacity:0.5;">Mingbuloq Specialized School</p>
-        </div>
-        <div id="users-list" style="flex:1; overflow-y:auto; padding-top:10px;">
-            </div>
-    </aside>
-
-    <main class="main-feed">
-        <header class="feed-header">
-            <h2 style="margin:0; font-size:20px;">Lenta</h2>
-            <div style="display:flex; gap:20px;">
-                <i class="fas fa-search nav-item"></i>
-                <i class="fas fa-bell nav-item"></i>
+    <div class="app-window" id="main-os" style="display:none;">
+        <header class="app-header">
+            <div class="brand-title">Net<span>Global</span></div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <b id="top-username" style="font-size: 14px; font-weight: 500;">@user</b>
+                <img id="top-avatar" src="" style="width:35px; height:35px; border-radius:50%; border:2px solid rgba(255,255,255,0.2);">
             </div>
         </header>
 
-        <div class="scroll-area" id="feed-container">
+        <div class="feed-scroll" id="feed-stream">
             </div>
 
-        <div class="input-container">
-            <div class="glass-input">
-                <label for="post-media" style="cursor:pointer; padding:10px;"><i class="fas fa-image" style="font-size:22px; color:var(--accent);"></i></label>
-                <input type="file" id="post-media" hidden onchange="uploadPost(this)">
-                <input type="text" id="post-caption" placeholder="Xabar yozing yoki post qoldiring..." onkeypress="if(event.key==='Enter') sendPostText()">
-                <button onclick="sendPostText()" style="background:none; border:none; padding:10px;"><i class="fas fa-paper-plane" style="font-size:22px; color:var(--accent);"></i></button>
+        <nav class="win-dock">
+            <div class="dock-item active" onclick="alert('Lenta sahifasi')"><i class="fas fa-home"></i></div>
+            <div class="dock-item" onclick="alert('Qidiruv funksiyasi tez orada!')"><i class="fas fa-search"></i></div>
+            <div class="dock-item create-btn" onclick="openCompose()"><i class="fas fa-plus"></i></div>
+            <div class="dock-item" onclick="alert('Xabarlar tizimi tez orada!')"><i class="fas fa-comment-alt"></i></div>
+            <div class="dock-item" onclick="showOsProfile()"><i class="fas fa-user"></i></div>
+        </nav>
+    </div>
+
+    <div class="compose-overlay" id="compose-widget">
+        <div class="compose-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin:0; font-weight:500;">Yangi Post</h3>
+                <i class="fas fa-times action-icon" onclick="closeCompose()"></i>
+            </div>
+            
+            <textarea id="post-text" placeholder="Fikringizni yozing..." class="win-input" style="height: 100px; resize:none; border:none; background:rgba(0,0,0,0.3);"></textarea>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <label for="media-upload" class="win-btn" style="flex:1; background:rgba(255,255,255,0.1); color:white; text-align:center; margin:0;"><i class="fas fa-image"></i> Media tanlash</label>
+                <input type="file" id="media-upload" hidden onchange="uploadOsMedia(this)">
+                <button class="win-btn" style="flex:1; margin:0;" onclick="sendOsPost()"><i class="fas fa-paper-plane"></i> Ulashish</button>
             </div>
         </div>
-    </main>
-
-    <nav class="mobile-bar">
-        <i class="fas fa-home nav-item active"></i>
-        <i class="fas fa-search nav-item"></i>
-        <i class="fas fa-plus-square nav-item" onclick="document.getElementById('post-media').click()" style="font-size:32px;"></i>
-        <i class="fas fa-comment nav-item"></i>
-        <i class="fas fa-user-circle nav-item" onclick="showProfile(myUser.uid)"></i>
-    </nav>
+    </div>
 
     <script>
-        // --- FIREBASE CONFIG ---
+        // --- FIREBASE CORE ---
         const firebaseConfig = {
             apiKey: "AIzaSyBqKqszWBCMrKIjN0Wb9PxC7wArkjd5FSU",
             authDomain: "netchat-52007.firebaseapp.com",
@@ -160,142 +201,124 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
-        const store = firebase.storage();
+        const storage = firebase.storage();
 
-        let myUser = null;
+        let osUser = null;
 
-        // --- AUTH LOGIC ---
-        function handleAuth() {
+        // --- AUTHENTICATION ---
+        function sysLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).then(res => {
                 db.ref('users/' + res.user.uid).once('value', snap => {
                     if(snap.exists()) {
-                        myUser = snap.val();
-                        initApp();
+                        osUser = snap.val();
+                        bootOS();
                     } else {
-                        document.getElementById('login-box').style.display = 'none';
-                        document.getElementById('setup-box').style.display = 'block';
+                        document.getElementById('login-ui').style.display = 'none';
+                        document.getElementById('reg-ui').style.display = 'block';
                     }
                 });
             });
         }
 
-        function completeProfile() {
-            const user = auth.currentUser;
-            const uname = document.getElementById('set-uname').value.trim();
-            if(!uname) return alert("Username tanlang!");
+        function sysSetup() {
+            const u = auth.currentUser;
+            const uname = document.getElementById('os-user').value.trim();
+            if(uname.length < 3) return alert("Username ni to'g'ri kiriting!");
             
-            myUser = {
-                uid: user.uid,
-                name: user.displayName,
+            osUser = {
+                uid: u.uid,
+                name: u.displayName,
                 username: uname.startsWith('@') ? uname : '@' + uname,
-                bio: document.getElementById('set-bio').value || "NetChat o'quvchisi",
-                avatar: user.photoURL
+                bio: document.getElementById('os-bio').value || "NetGlobal jamoasi a'zosi",
+                avatar: u.photoURL
             };
-            db.ref('users/' + user.uid).set(myUser).then(initApp);
+            db.ref('users/' + u.uid).set(osUser).then(bootOS);
         }
 
-        function initApp() {
-            document.getElementById('auth-modal').style.display = 'none';
-            document.getElementById('display-username').innerText = myUser.username;
-            listenToPosts();
-            loadContacts();
+        function bootOS() {
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-os').style.display = 'flex';
+            document.getElementById('top-username').innerText = osUser.username;
+            document.getElementById('top-avatar').src = osUser.avatar;
+            streamPosts();
         }
 
-        // --- POSTING SYSTEM ---
-        function sendPostText() {
-            const text = document.getElementById('post-caption').value;
-            if(!text.trim()) return;
-            pushPost({ type: 'text', content: text });
-            document.getElementById('post-caption').value = "";
+        // --- POSTING & UI WIDGETS ---
+        function openCompose() { document.getElementById('compose-widget').style.display = 'flex'; }
+        function closeCompose() { document.getElementById('compose-widget').style.display = 'none'; }
+
+        function sendOsPost() {
+            const txt = document.getElementById('post-text').value;
+            if(!txt.trim()) return;
+            publish({ type: 'text', content: txt });
+            document.getElementById('post-text').value = "";
+            closeCompose();
         }
 
-        function uploadPost(input) {
+        function uploadOsMedia(input) {
             const file = input.files[0];
             if(!file) return;
-            const ref = store.ref(`social_posts/${Date.now()}_${file.name}`);
+            const ref = storage.ref(`os_media/${Date.now()}_${file.name}`);
             ref.put(file).then(s => s.ref.getDownloadURL()).then(url => {
-                let type = file.type.startsWith('image/') ? 'img' : (file.type.startsWith('video/') ? 'vid' : 'file');
-                pushPost({ type: type, content: url, fileName: file.name });
+                let mType = file.type.startsWith('image/') ? 'img' : (file.type.startsWith('video/') ? 'vid' : 'file');
+                publish({ type: mType, content: url, filename: file.name });
+                closeCompose();
             });
         }
 
-        function pushPost(data) {
-            db.ref('posts').push({
-                ...data,
-                uid: myUser.uid,
-                username: myUser.username,
-                userPic: myUser.avatar,
-                timestamp: Date.now(),
-                likes: 0
+        function publish(data) {
+            db.ref('os_posts').push({
+                ...data, uid: osUser.uid, username: osUser.username, avatar: osUser.avatar, time: Date.now()
             });
         }
 
-        function listenToPosts() {
-            db.ref('posts').on('child_added', snap => {
+        // --- FEED RENDER (Instagram Style + Windows Mica) ---
+        function streamPosts() {
+            db.ref('os_posts').on('child_added', snap => {
                 const p = snap.val();
-                let mediaHTML = "";
-                if(p.type === 'img') mediaHTML = `<div class="post-media"><img src="${p.content}"></div>`;
-                else if(p.type === 'vid') mediaHTML = `<div class="post-media"><video controls src="${p.content}"></video></div>`;
+                let mediaElement = "";
+                
+                if(p.type === 'img') mediaElement = `<div class="post-media"><img src="${p.content}"></div>`;
+                else if(p.type === 'vid') mediaElement = `<div class="post-media"><video controls src="${p.content}"></video></div>`;
                 
                 const html = `
-                <div class="post-card" id="p-${snap.key}">
-                    <div class="post-top">
-                        <img src="${p.userPic}" style="width:35px; height:35px; border-radius:50%;">
-                        <b style="font-size:14px; cursor:pointer;" onclick="showProfile('${p.uid}')">${p.username}</b>
-                        ${p.uid === myUser.uid ? `<i class="fas fa-trash" style="margin-left:auto; opacity:0.4; cursor:pointer;" onclick="deletePost('${snap.key}')"></i>` : ''}
+                <div class="post-widget" id="post-${snap.key}">
+                    <div class="post-header">
+                        <img src="${p.avatar}" class="post-avatar">
+                        <div>
+                            <div style="font-weight: 600; font-size: 15px;">${p.username}</div>
+                            <div style="font-size: 11px; color: var(--text-sub);">${new Date(p.time).toLocaleString()}</div>
+                        </div>
+                        ${p.uid === osUser.uid ? `<i class="fas fa-ellipsis-h action-icon" style="margin-left:auto;" onclick="delOsPost('${snap.key}')"></i>` : ''}
                     </div>
-                    ${mediaHTML}
-                    <div class="post-bottom">
-                        <div class="actions">
-                            <i class="far fa-heart" id="like-${snap.key}" onclick="likePost('${snap.key}')"></i>
-                            <i class="far fa-comment"></i>
-                            <i class="far fa-paper-plane"></i>
+                    ${mediaElement}
+                    <div class="post-body">
+                        <div class="post-actions">
+                            <i class="far fa-heart action-icon" onclick="this.classList.toggle('fas'); this.classList.toggle('far'); this.style.color = this.classList.contains('fas') ? '#ec4899' : '';"></i>
+                            <i class="far fa-comment action-icon"></i>
+                            <i class="far fa-paper-plane action-icon"></i>
                         </div>
-                        <div style="font-size:14px;">
-                            <b>${p.username}</b> ${p.type === 'text' ? p.content : (p.fileName || 'Post')}
+                        <div class="post-caption">
+                            <b>${p.username}</b> ${p.type === 'text' ? p.content : (p.filename || 'Yangi media yuklandi')}
                         </div>
-                        <small style="opacity:0.4; font-size:10px; margin-top:8px; display:block;">${new Date(p.timestamp).toLocaleString()}</small>
                     </div>
                 </div>`;
-                const container = document.getElementById('feed-container');
-                container.innerHTML = html + container.innerHTML;
+                
+                const feed = document.getElementById('feed-stream');
+                feed.innerHTML = html + feed.innerHTML;
             });
-            db.ref('posts').on('child_removed', snap => document.getElementById('p-' + snap.key).remove());
-        }
-
-        function deletePost(id) { if(confirm("Post o'chirilsinmi?")) db.ref('posts/' + id).remove(); }
-
-        function loadContacts() {
-            db.ref('users').on('value', snap => {
-                const list = document.getElementById('users-list');
-                list.innerHTML = "";
-                snap.forEach(child => {
-                    const u = child.val();
-                    list.innerHTML += `
-                    <div class="contact-card" onclick="showProfile('${u.uid}')">
-                        <img src="${u.avatar}" class="avatar">
-                        <div>
-                            <div style="font-weight:600; font-size:14px;">${u.name}</div>
-                            <div style="font-size:11px; opacity:0.5;">${u.username}</div>
-                        </div>
-                    </div>`;
-                });
+            
+            db.ref('os_posts').on('child_removed', snap => {
+                const el = document.getElementById('post-' + snap.key);
+                if(el) el.remove();
             });
         }
 
-        function showProfile(uid) {
-            db.ref('users/' + uid).once('value', snap => {
-                const u = snap.val();
-                alert(`👤 PROFIL:\nIsm: ${u.name}\nUser: ${u.username}\nBio: ${u.bio}`);
-            });
-        }
+        function delOsPost(id) { if(confirm("Postni o'chirishni tasdiqlaysizmi?")) db.ref('os_posts/' + id).remove(); }
 
-        function likePost(id) {
-            const icon = document.getElementById('like-' + id);
-            icon.classList.toggle('fas');
-            icon.classList.toggle('far');
-            icon.style.color = icon.classList.contains('fas') ? '#ec4899' : '';
+        function showOsProfile() {
+            alert(`Sistemadagi profil:\n\nFoydalanuvchi: ${osUser.name}\nUsername: ${osUser.username}\nBio/Status: ${osUser.bio}`);
         }
     </script>
 </body>
