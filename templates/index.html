@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetChat | Social Hybrid</title>
+    <title>NetChat | Next-Gen Social</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
@@ -13,100 +13,141 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
     <style>
         :root {
-            --accent: #a855f7;
+            --accent: #8b5cf6;
+            --secondary: #ec4899;
             --bg: #020617;
-            --card: rgba(30, 41, 59, 0.7);
+            --glass: rgba(30, 41, 59, 0.6);
             --text: #f8fafc;
-            --gradient: linear-gradient(135deg, #1e1b4b 0%, #020617 100%);
         }
 
-        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; background: var(--gradient); color: var(--text); height: 100vh; overflow: hidden; display: flex; }
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background: radial-gradient(circle at top right, #1e1b4b, #020617);
+            color: var(--text); height: 100vh; overflow: hidden; display: flex; 
+        }
 
-        /* --- SIDEBAR (TELEGRAM STYLE) --- */
-        .sidebar { width: 350px; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; transition: 0.4s; z-index: 1000; }
-        .side-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .user-card { padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; border-radius: 15px; margin: 5px 10px; }
-        .user-card:hover { background: rgba(168, 85, 247, 0.1); }
-        .online-dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; border: 2px solid #0f172a; position: absolute; bottom: 0; right: 0; }
+        /* --- LEFT SIDEBAR (Telegram Style) --- */
+        .sidebar { 
+            width: 320px; background: rgba(15, 23, 42, 0.8); 
+            backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); 
+            display: flex; flex-direction: column; transition: 0.3s;
+        }
+        .side-head { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .contact-card { 
+            padding: 12px 15px; margin: 5px 10px; border-radius: 12px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .contact-card:hover { background: rgba(139, 92, 246, 0.15); }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
 
-        /* --- FEED/CHAT (INSTAGRAM STYLE) --- */
-        .feed-container { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at top right, rgba(168, 85, 247, 0.15), transparent); }
-        .feed-header { padding: 15px 25px; background: rgba(2, 6, 23, 0.5); backdrop-filter: blur(10px); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .posts-area { flex: 1; overflow-y: auto; padding: 20px; scroll-behavior: smooth; display: flex; flex-direction: column; align-items: center; }
+        /* --- MAIN CONTENT (Instagram Style Feed) --- */
+        .main-feed { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .feed-header { 
+            padding: 15px 25px; background: rgba(2, 6, 23, 0.7); 
+            backdrop-filter: blur(15px); display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1); sticky: top; z-index: 100;
+        }
+        .scroll-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
 
         /* POST CARD */
-        .post { width: 100%; max-width: 500px; background: var(--card); border-radius: 20px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; animation: fadeInUp 0.5s ease; }
-        .post-head { padding: 12px 15px; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
-        .post-content { width: 100%; background: #000; display: flex; justify-content: center; }
-        .post-content img, .post-content video { width: 100%; max-height: 500px; object-fit: contain; }
-        .post-info { padding: 15px; }
-        .post-text { font-size: 14px; margin-top: 8px; line-height: 1.5; opacity: 0.9; }
-        .post-actions { display: flex; gap: 15px; margin-top: 10px; font-size: 20px; color: var(--accent); }
+        .post-card { 
+            width: 100%; max-width: 500px; background: var(--glass); 
+            border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .post-top { padding: 12px 15px; display: flex; align-items: center; gap: 10px; }
+        .post-media { width: 100%; min-height: 300px; background: #000; display: flex; align-items: center; }
+        .post-media img, .post-media video { width: 100%; display: block; }
+        .post-bottom { padding: 15px; }
+        .actions { display: flex; gap: 18px; font-size: 22px; margin-bottom: 10px; }
+        .actions i { cursor: pointer; transition: 0.2s; }
+        .actions i:hover { color: var(--secondary); transform: scale(1.1); }
 
-        /* --- INPUT AREA --- */
-        .input-wrapper { padding: 20px; display: flex; justify-content: center; }
-        .input-box { width: 100%; max-width: 600px; background: rgba(255,255,255,0.05); border-radius: 30px; display: flex; align-items: center; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.1); }
-        .input-box input { flex: 1; background: none; border: none; color: white; padding: 12px; outline: none; }
+        /* --- INPUT BAR --- */
+        .input-container { 
+            padding: 20px; background: linear-gradient(to top, var(--bg), transparent);
+            display: flex; justify-content: center; width: 100%; box-sizing: border-box;
+        }
+        .glass-input { 
+            width: 100%; max-width: 600px; background: rgba(255,255,255,0.05); 
+            border-radius: 30px; display: flex; align-items: center; padding: 5px 15px; 
+            border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+        }
+        .glass-input input { flex: 1; background: none; border: none; color: white; padding: 12px; outline: none; }
 
-        /* --- MOBILE --- */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(15, 23, 42, 0.95); display: none; justify-content: space-around; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-        @media (max-width: 768px) { .sidebar { display: none; } .bottom-nav { display: flex; } .feed-container { padding-bottom: 70px; } }
+        /* --- MOBILE NAVIGATION --- */
+        .mobile-bar { 
+            position: fixed; bottom: 0; width: 100%; height: 70px; 
+            background: rgba(15, 23, 42, 0.9); display: none; justify-content: space-around; 
+            align-items: center; border-top: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(15px);
+        }
+        .nav-item { font-size: 24px; color: #94a3b8; cursor: pointer; transition: 0.3s; }
+        .nav-item.active { color: var(--accent); }
 
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { 
+            .sidebar { display: none; } 
+            .mobile-bar { display: flex; } 
+            .scroll-area { padding-bottom: 80px; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="auth-modal" class="modal" style="position:fixed; inset:0; background:#020617; z-index:9999; display:flex; align-items:center; justify-content:center;">
-        <div style="background:#1e293b; padding:40px; border-radius:30px; text-align:center; width:90%; max-width:400px; border:1px solid var(--accent);">
-            <h1 style="background:linear-gradient(to right, #a855f7, #6366f1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:40px; margin-bottom:10px;">NetChat</h1>
-            <div id="login-section">
-                <button onclick="login()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Google bilan boshlash</button>
+    <div id="auth-modal" class="modal" style="position:fixed; inset:0; background:var(--bg); z-index:10000; display:flex; align-items:center; justify-content:center;">
+        <div style="background:var(--glass); padding:40px; border-radius:30px; text-align:center; width:85%; max-width:400px; border:1px solid var(--accent); backdrop-filter:blur(20px);">
+            <h1 style="font-size:35px; margin-bottom:10px; background:linear-gradient(to right, #8b5cf6, #ec4899); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">NetChat</h1>
+            <div id="login-box">
+                <button onclick="handleAuth()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Google bilan kirish</button>
             </div>
-            <div id="reg-section" style="display:none; text-align:left; margin-top:20px;">
-                <input type="text" id="r-user" placeholder="@username" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; background:#0f172a; border:1px solid #334155; color:white;">
-                <textarea id="r-bio" placeholder="Bio..." style="width:100%; padding:12px; height:80px; border-radius:10px; background:#0f172a; border:1px solid #334155; color:white; resize:none;"></textarea>
-                <button onclick="saveProfile()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Profilingizni yarating</button>
+            <div id="setup-box" style="display:none; text-align:left; margin-top:20px;">
+                <input type="text" id="set-uname" placeholder="@username" style="width:100%; padding:12px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid #444; color:white; margin-bottom:10px;">
+                <textarea id="set-bio" placeholder="Bio (Masalan: 8-sinf o'quvchisi)" style="width:100%; padding:12px; height:80px; border-radius:10px; background:rgba(0,0,0,0.3); border:1px solid #444; color:white; resize:none;"></textarea>
+                <button onclick="completeProfile()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--secondary); color:white; font-weight:bold; cursor:pointer;">Tayyor!</button>
             </div>
         </div>
     </div>
 
     <aside class="sidebar">
-        <div class="side-header">
-            <h2 id="my-username" style="color:var(--accent); margin:0;">@username</h2>
-            <small style="opacity:0.5;">Global Community</small>
+        <div class="side-head">
+            <h2 id="display-username" style="margin:0; color:var(--accent);">@username</h2>
+            <p style="font-size:12px; opacity:0.5;">Mingbuloq Specialized School</p>
         </div>
-        <div id="users-list" style="flex:1; overflow-y:auto; padding-top:10px;"></div>
+        <div id="users-list" style="flex:1; overflow-y:auto; padding-top:10px;">
+            </div>
     </aside>
 
-    <main class="feed-container">
+    <main class="main-feed">
         <header class="feed-header">
-            <h3 style="margin:0;">Global Feed</h3>
-            <i class="fas fa-paper-plane" style="font-size:20px; color:var(--accent);"></i>
+            <h2 style="margin:0; font-size:20px;">Lenta</h2>
+            <div style="display:flex; gap:20px;">
+                <i class="fas fa-search nav-item"></i>
+                <i class="fas fa-bell nav-item"></i>
+            </div>
         </header>
 
-        <div class="posts-area" id="posts-container">
+        <div class="scroll-area" id="feed-container">
             </div>
 
-        <div class="input-wrapper">
-            <div class="input-box">
-                <label for="media-up" style="cursor:pointer; padding:10px;"><i class="fas fa-camera" style="font-size:20px; color:var(--accent);"></i></label>
-                <input type="file" id="media-up" hidden onchange="uploadPost(this)">
-                <input type="text" id="post-text" placeholder="Nima gaplar?..." onkeypress="if(event.key==='Enter') sendText()">
-                <button onclick="sendText()" style="background:none; border:none; padding:10px;"><i class="fas fa-arrow-up" style="font-size:20px; color:var(--accent);"></i></button>
+        <div class="input-container">
+            <div class="glass-input">
+                <label for="post-media" style="cursor:pointer; padding:10px;"><i class="fas fa-image" style="font-size:22px; color:var(--accent);"></i></label>
+                <input type="file" id="post-media" hidden onchange="uploadPost(this)">
+                <input type="text" id="post-caption" placeholder="Xabar yozing yoki post qoldiring..." onkeypress="if(event.key==='Enter') sendPostText()">
+                <button onclick="sendPostText()" style="background:none; border:none; padding:10px;"><i class="fas fa-paper-plane" style="font-size:22px; color:var(--accent);"></i></button>
             </div>
         </div>
     </main>
 
-    <nav class="bottom-nav">
-        <i class="fas fa-home" style="color:var(--accent); font-size:24px;"></i>
-        <i class="fas fa-search" style="font-size:24px; opacity:0.6;"></i>
-        <i class="fas fa-plus-circle" onclick="document.getElementById('media-up').click()" style="font-size:30px; color:var(--accent);"></i>
-        <i class="fas fa-heart" style="font-size:24px; opacity:0.6;"></i>
-        <i class="fas fa-user-circle" style="font-size:24px; opacity:0.6;"></i>
+    <nav class="mobile-bar">
+        <i class="fas fa-home nav-item active"></i>
+        <i class="fas fa-search nav-item"></i>
+        <i class="fas fa-plus-square nav-item" onclick="document.getElementById('post-media').click()" style="font-size:32px;"></i>
+        <i class="fas fa-comment nav-item"></i>
+        <i class="fas fa-user-circle nav-item" onclick="showProfile(myUser.uid)"></i>
     </nav>
 
     <script>
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBqKqszWBCMrKIjN0Wb9PxC7wArkjd5FSU",
             authDomain: "netchat-52007.firebaseapp.com",
@@ -121,114 +162,140 @@
         const auth = firebase.auth();
         const store = firebase.storage();
 
-        let userData = null;
+        let myUser = null;
 
-        // AUTH
-        function login() {
+        // --- AUTH LOGIC ---
+        function handleAuth() {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).then(res => {
                 db.ref('users/' + res.user.uid).once('value', snap => {
-                    if(snap.exists()) { userData = snap.val(); startApp(); }
-                    else { document.getElementById('login-section').style.display='none'; document.getElementById('reg-section').style.display='block'; }
+                    if(snap.exists()) {
+                        myUser = snap.val();
+                        initApp();
+                    } else {
+                        document.getElementById('login-box').style.display = 'none';
+                        document.getElementById('setup-box').style.display = 'block';
+                    }
                 });
             });
         }
 
-        function saveProfile() {
-            const u = auth.currentUser;
-            const uname = document.getElementById('r-user').value.trim();
-            if(!uname) return alert("Username kiriting!");
-            userData = {
-                uid: u.uid,
-                fullname: u.displayName,
+        function completeProfile() {
+            const user = auth.currentUser;
+            const uname = document.getElementById('set-uname').value.trim();
+            if(!uname) return alert("Username tanlang!");
+            
+            myUser = {
+                uid: user.uid,
+                name: user.displayName,
                 username: uname.startsWith('@') ? uname : '@' + uname,
-                bio: document.getElementById('r-bio').value || "NetChat o'quvchisi",
-                pic: u.photoURL
+                bio: document.getElementById('set-bio').value || "NetChat o'quvchisi",
+                avatar: user.photoURL
             };
-            db.ref('users/' + u.uid).set(userData).then(startApp);
+            db.ref('users/' + user.uid).set(myUser).then(initApp);
         }
 
-        function startApp() {
+        function initApp() {
             document.getElementById('auth-modal').style.display = 'none';
-            document.getElementById('my-username').innerText = userData.username;
-            loadPosts();
-            loadUsers();
+            document.getElementById('display-username').innerText = myUser.username;
+            listenToPosts();
+            loadContacts();
         }
 
-        // POSTS
-        function sendText() {
-            const txt = document.getElementById('post-text').value;
-            if(!txt.trim()) return;
-            pushToDB({ type: 'text', content: txt });
-            document.getElementById('post-text').value = "";
+        // --- POSTING SYSTEM ---
+        function sendPostText() {
+            const text = document.getElementById('post-caption').value;
+            if(!text.trim()) return;
+            pushPost({ type: 'text', content: text });
+            document.getElementById('post-caption').value = "";
         }
 
         function uploadPost(input) {
             const file = input.files[0];
             if(!file) return;
-            const ref = store.ref(`social/${Date.now()}_${file.name}`);
+            const ref = store.ref(`social_posts/${Date.now()}_${file.name}`);
             ref.put(file).then(s => s.ref.getDownloadURL()).then(url => {
-                let t = file.type.startsWith('image/') ? 'img' : (file.type.startsWith('video/') ? 'vid' : 'file');
-                pushToDB({ type: t, content: url, fileName: file.name });
+                let type = file.type.startsWith('image/') ? 'img' : (file.type.startsWith('video/') ? 'vid' : 'file');
+                pushPost({ type: type, content: url, fileName: file.name });
             });
         }
 
-        function pushToDB(data) {
+        function pushPost(data) {
             db.ref('posts').push({
-                ...data, uid: userData.uid, username: userData.username, pic: userData.pic, time: Date.now()
+                ...data,
+                uid: myUser.uid,
+                username: myUser.username,
+                userPic: myUser.avatar,
+                timestamp: Date.now(),
+                likes: 0
             });
         }
 
-        function loadPosts() {
+        function listenToPosts() {
             db.ref('posts').on('child_added', snap => {
                 const p = snap.val();
-                let media = "";
-                if(p.type === 'img') media = `<div class="post-content"><img src="${p.content}"></div>`;
-                else if(p.type === 'vid') media = `<div class="post-content"><video controls src="${p.content}"></video></div>`;
+                let mediaHTML = "";
+                if(p.type === 'img') mediaHTML = `<div class="post-media"><img src="${p.content}"></div>`;
+                else if(p.type === 'vid') mediaHTML = `<div class="post-media"><video controls src="${p.content}"></video></div>`;
                 
                 const html = `
-                    <div class="post" id="${snap.key}">
-                        <div class="post-head">
-                            <div style="width:35px; height:35px; border-radius:50%; background:var(--accent); overflow:hidden;">
-                                <img src="${p.pic}" style="width:100%; height:100%;">
-                            </div>
-                            <span>${p.username}</span>
-                            ${p.uid === userData.uid ? `<i class="fas fa-trash" onclick="deletePost('${snap.key}')" style="margin-left:auto; opacity:0.5; cursor:pointer;"></i>` : ''}
+                <div class="post-card" id="p-${snap.key}">
+                    <div class="post-top">
+                        <img src="${p.userPic}" style="width:35px; height:35px; border-radius:50%;">
+                        <b style="font-size:14px; cursor:pointer;" onclick="showProfile('${p.uid}')">${p.username}</b>
+                        ${p.uid === myUser.uid ? `<i class="fas fa-trash" style="margin-left:auto; opacity:0.4; cursor:pointer;" onclick="deletePost('${snap.key}')"></i>` : ''}
+                    </div>
+                    ${mediaHTML}
+                    <div class="post-bottom">
+                        <div class="actions">
+                            <i class="far fa-heart" id="like-${snap.key}" onclick="likePost('${snap.key}')"></i>
+                            <i class="far fa-comment"></i>
+                            <i class="far fa-paper-plane"></i>
                         </div>
-                        ${media}
-                        <div class="post-info">
-                            <div class="post-actions"><i class="far fa-heart"></i> <i class="far fa-comment"></i> <i class="far fa-paper-plane"></i></div>
-                            <div class="post-text"><b>${p.username}</b> ${p.type === 'text' ? p.content : (p.fileName || '')}</div>
-                            <small style="opacity:0.4; font-size:10px;">${new Date(p.time).toLocaleString()}</small>
+                        <div style="font-size:14px;">
+                            <b>${p.username}</b> ${p.type === 'text' ? p.content : (p.fileName || 'Post')}
                         </div>
-                    </div>`;
-                const container = document.getElementById('posts-container');
+                        <small style="opacity:0.4; font-size:10px; margin-top:8px; display:block;">${new Date(p.timestamp).toLocaleString()}</small>
+                    </div>
+                </div>`;
+                const container = document.getElementById('feed-container');
                 container.innerHTML = html + container.innerHTML;
             });
-            db.ref('posts').on('child_removed', snap => document.getElementById(snap.key).remove());
+            db.ref('posts').on('child_removed', snap => document.getElementById('p-' + snap.key).remove());
         }
 
-        function deletePost(id) { if(confirm("O'chirilsinmi?")) db.ref('posts/' + id).remove(); }
+        function deletePost(id) { if(confirm("Post o'chirilsinmi?")) db.ref('posts/' + id).remove(); }
 
-        function loadUsers() {
+        function loadContacts() {
             db.ref('users').on('value', snap => {
                 const list = document.getElementById('users-list');
                 list.innerHTML = "";
-                snap.forEach(c => {
-                    const u = c.val();
+                snap.forEach(child => {
+                    const u = child.val();
                     list.innerHTML += `
-                        <div class="user-card" onclick="alert('Bio: ${u.bio}')">
-                            <div style="position:relative; width:45px; height:45px; border-radius:50%; background:var(--accent); overflow:hidden;">
-                                <img src="${u.pic}" style="width:100%; height:100%;">
-                                <div class="online-dot"></div>
-                            </div>
-                            <div>
-                                <div style="font-weight:600;">${u.fullname}</div>
-                                <div style="font-size:12px; opacity:0.6;">${u.username}</div>
-                            </div>
-                        </div>`;
+                    <div class="contact-card" onclick="showProfile('${u.uid}')">
+                        <img src="${u.avatar}" class="avatar">
+                        <div>
+                            <div style="font-weight:600; font-size:14px;">${u.name}</div>
+                            <div style="font-size:11px; opacity:0.5;">${u.username}</div>
+                        </div>
+                    </div>`;
                 });
             });
+        }
+
+        function showProfile(uid) {
+            db.ref('users/' + uid).once('value', snap => {
+                const u = snap.val();
+                alert(`👤 PROFIL:\nIsm: ${u.name}\nUser: ${u.username}\nBio: ${u.bio}`);
+            });
+        }
+
+        function likePost(id) {
+            const icon = document.getElementById('like-' + id);
+            icon.classList.toggle('fas');
+            icon.classList.toggle('far');
+            icon.style.color = icon.classList.contains('fas') ? '#ec4899' : '';
         }
     </script>
 </body>
