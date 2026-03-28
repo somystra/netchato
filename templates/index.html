@@ -3,116 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetGlobal OS | Pro Social</title>
+    <title>NetGlobal OS | Premium Social</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
-    <style>
-        /* MUKAMMAL LOGOTIP DIZAYNI (Glassmorphism & Gradient) */
-        .ng-logo {
-            display: flex; align-items: center; justify-content: center;
-            gap: 12px; font-family: 'Inter', sans-serif; font-weight: 700; text-decoration: none;
-        }
-        .ng-logo-icon {
-            width: 45px; height: 45px; border-radius: 12px;
-            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 22px; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .ng-logo-text {
-            font-size: 28px; color: white; letter-spacing: -1px;
-        }
-        .ng-logo-text span { color: #a855f7; }
-
-        /* Kirish sahifasidagi katta logotip */
-        .auth-card .ng-logo { flex-direction: column; margin-bottom: 30px; }
-        .auth-card .ng-logo-icon { width: 80px; height: 80px; font-size: 40px; border-radius: 20px; }
-        .auth-card .ng-logo-text { font-size: 36px; }
-
-        /* Tepa qismdagi kichik logotip */
-        .app-header .ng-logo-icon { width: 35px; height: 35px; font-size: 18px; border-radius: 8px; }
-        .app-header .ng-logo-text { font-size: 22px; }
-        
-        /* Vizual tuzatishlar */
-        .story-circle { border: 2px solid #a855f7; padding: 2px; }
-        .win-btn i { margin-right: 8px; }
-    </style>
 </head>
 <body>
 
-    <div id="auth-screen" class="auth-overlay" style="position:fixed; inset:0; background:#010409; z-index:10000; display:flex; align-items:center; justify-content:center;">
-        <div class="auth-card" style="background:rgba(22,27,34,0.7); backdrop-filter:blur(30px); padding:40px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); text-align:center; width:90%; max-width:400px;">
-            
-            <a href="#" class="ng-logo">
-                <div class="ng-logo-icon">N</div>
-                <div class="ng-logo-text">Net<span>Global</span> OS</div>
-            </a>
-
+    <div id="auth-screen" class="win-lock-screen">
+        <div class="auth-card">
+            <div class="ng-logo-large">
+                <div class="logo-box">N</div>
+                <h1>Net<span>Global</span> OS</h1>
+            </div>
             <div id="login-ui">
-                <p style="color:#94a3b8; margin-bottom: 30px; font-size:14px;">Professional ijtimoiy operatsion tizim</p>
-                <button class="win-btn" id="btnLoginGoogle" style="width:100%; padding:15px; border-radius:12px; border:none; background:#a855f7; color:white; font-weight:600; cursor:pointer;">
-                    <i class="fab fa-google"></i> Google Identity
+                <p>Xush kelibsiz, tizimga kiring</p>
+                <button class="win-prime-btn" id="btnLoginGoogle">
+                    <i class="fab fa-google"></i> Google bilan kirish
                 </button>
             </div>
-
-            <div id="reg-ui" style="display:none; text-align: left;">
-                <label style="font-size: 13px; color: #94a3b8; margin-left: 10px;">@username tanlang</label>
-                <input type="text" id="os-username-input" placeholder="@username" class="win-input" style="width:100%; padding:12px; margin-top:5px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:10px;">
-                <button class="win-btn" id="btnCompleteProfile" style="width:100%; padding:15px; border-radius:12px; border:none; background:#a855f7; color:white; font-weight:600; cursor:pointer; margin-top:15px;">
-                    Tizimni ishga tushirish
-                </button>
+            <div id="reg-ui" style="display:none;">
+                <input type="text" id="os-username-input" placeholder="@username tanlang" class="win-input">
+                <button class="win-prime-btn" id="btnCompleteProfile">Tizimni yaratish</button>
             </div>
         </div>
     </div>
 
-    <div class="app-window" id="main-os" style="display:none; height:100vh; flex-direction:column;">
-        <header class="app-header" style="padding:15px 25px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(2,6,23,0.5); backdrop-filter:blur(10px);">
+    <div class="app-container" id="main-os" style="display:none;">
+        
+        <aside class="win-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-mini">N</div>
+                <span class="logo-text">Net<span>Global</span></span>
+            </div>
             
-            <a href="#" class="ng-logo">
-                <div class="ng-logo-icon">N</div>
-                <div class="ng-logo-text">Net<span>Global</span></div>
-            </a>
+            <nav class="side-nav">
+                <div class="nav-item active"><i class="fa-solid fa-house"></i> <span>Asosiy</span></div>
+                <div class="nav-item"><i class="fa-solid fa-magnifying-glass"></i> <span>Qidiruv</span></div>
+                <div class="nav-item"><i class="fa-solid fa-compass"></i> <span>Explore</span></div>
+                <div class="nav-item" id="btnOpenCompose"><i class="fa-solid fa-square-plus"></i> <span>Yaratish</span></div>
+                <div class="nav-item"><i class="fa-solid fa-paper-plane"></i> <span>Xabarlar</span></div>
+                <div class="nav-item"><i class="fa-solid fa-heart"></i> <span>Bildirishnoma</span></div>
+                <div class="nav-item" id="user-profile-btn">
+                    <img id="top-avatar-img" src="" class="nav-avatar"> <span>Profil</span>
+                </div>
+            </nav>
 
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <b id="top-username-display" style="font-size: 14px; font-weight: 500;">@user</b>
-                <img id="top-avatar-img" src="https://via.placeholder.com/35" style="width:35px; height:35px; border-radius:50%; border:2px solid #a855f7;">
+            <div class="sidebar-footer">
+                <div class="nav-item"><i class="fa-solid fa-bars"></i> <span>Yana</span></div>
             </div>
-        </header>
+        </aside>
 
-        <div class="feed-scroll" id="feed-stream-cont" style="flex:1; overflow-y:auto; padding:30px 20px 100px 20px;">
+        <main class="content-wrapper">
+            
+            <div class="stories-container" id="stories-cont">
+                <div class="story-item">
+                    <div class="story-ring"><img src="https://via.placeholder.com/150"></div>
+                    <span>Siz</span>
+                </div>
             </div>
 
-        <nav class="win-dock" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(30,41,59,0.7); backdrop-filter:blur(30px); padding:10px 20px; border-radius:30px; display:flex; gap:25px; border:1px solid rgba(255,255,255,0.1); z-index:1000;">
-            <div class="dock-item active"><i class="fas fa-home"></i></div>
-            <div class="dock-item"><i class="fas fa-search"></i></div>
-            <div class="dock-item create-btn" id="btnOpenCompose" style="background:#a855f7; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; cursor:pointer;"><i class="fas fa-plus"></i></div>
-            <div class="dock-item"><i class="fas fa-comment-alt"></i></div>
-            <div class="dock-item"><i class="fas fa-user"></i></div>
-        </nav>
+            <div class="insta-feed" id="feed-stream-cont">
+                </div>
+        </main>
+
     </div>
 
-    <div class="compose-overlay" id="compose-widget-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; z-index:2000;">
-        <div class="compose-card" style="background:rgba(30,41,59,0.9); padding:25px; border-radius:20px; width:90%; max-width:450px; border:1px solid rgba(255,255,255,0.1);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="margin:0; font-weight:600;">Yangi post</h3>
-                <i class="fas fa-times action-icon" id="btnCloseCompose" style="cursor:pointer; opacity:0.5;"></i>
+    <div class="modal-overlay" id="compose-widget-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Yangi post yaratish</h3>
+                <i class="fa-solid fa-xmark" id="btnCloseCompose"></i>
             </div>
-            
-            <textarea id="post-caption-input" placeholder="Nima gaplar? #NetGlobalOS" class="win-input" style="width:100%; height:100px; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:10px; resize:none;"></textarea>
-            
-            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                <label for="media-file-upload" class="win-btn" style="flex:1; background:rgba(255,255,255,0.1); color:white; text-align:center; padding:12px; border-radius:10px; cursor:pointer;">
-                    <i class="fas fa-image"></i> Rasm/Video
-                </label>
-                <input type="file" id="media-file-upload" hidden>
-                <button class="win-btn" id="btnPublishPost" style="flex:1; padding:12px; border-radius:10px; border:none; background:#a855f7; color:white; font-weight:600;">
-                    <i class="fas fa-paper-plane"></i> Ulashish
-                </button>
+            <div class="modal-body">
+                <textarea id="post-caption-input" placeholder="Fikringizni yozing..."></textarea>
+                <div class="upload-zone">
+                    <label for="media-file-upload">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Rasm yoki video yuklash</span>
+                    </label>
+                    <input type="file" id="media-file-upload" hidden>
+                </div>
+                <button class="win-prime-btn" id="btnPublishPost">Ulashish</button>
             </div>
         </div>
     </div>
@@ -121,7 +95,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBqKqszWBCMrKIjN0Wb9PxC7wArkjd5FSU",
@@ -132,11 +105,8 @@
             messagingSenderId: "145404562699",
             appId: "1:145404562699:web:5eeb4c6abc3e18675b660e"
         };
-        // Firebase-ni ishga tushirish (boshqa JS fayllardan avval)
         firebase.initializeApp(firebaseConfig);
     </script>
-
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
 </body>
 </html>
