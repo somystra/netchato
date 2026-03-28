@@ -3,143 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetGlobal OS | Instagram Pro</title>
+    <title>NetGlobal OS | Pro Social</title>
     
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        :root {
-            --win-bg: #010409;
-            --accent: #a855f7;
-            --glass: rgba(22, 27, 34, 0.7);
-            --border: 1px solid rgba(255, 255, 255, 0.1);
-            --mica: blur(40px) saturate(180%);
-            --text: #f0f6fc;
+        /* MUKAMMAL LOGOTIP DIZAYNI (Glassmorphism & Gradient) */
+        .ng-logo {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; font-family: 'Inter', sans-serif; font-weight: 700; text-decoration: none;
         }
+        .ng-logo-icon {
+            width: 45px; height: 45px; border-radius: 12px;
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 22px; box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .ng-logo-text {
+            font-size: 28px; color: white; letter-spacing: -1px;
+        }
+        .ng-logo-text span { color: #a855f7; }
 
-        body { 
-            margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: radial-gradient(circle at top right, #161b22, #0d1117);
-            color: var(--text); height: 100vh; overflow: hidden; display: flex;
-        }
+        /* Kirish sahifasidagi katta logotip */
+        .auth-card .ng-logo { flex-direction: column; margin-bottom: 30px; }
+        .auth-card .ng-logo-icon { width: 80px; height: 80px; font-size: 40px; border-radius: 20px; }
+        .auth-card .ng-logo-text { font-size: 36px; }
 
-        /* --- MAGIC OS: SIDEBAR (NAVIGATION) --- */
-        .win-sidebar {
-            width: 260px; background: var(--glass); backdrop-filter: var(--mica);
-            border-right: var(--border); display: flex; flex-direction: column; padding: 20px 0;
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .nav-link {
-            padding: 12px 25px; display: flex; align-items: center; gap: 15px;
-            font-size: 16px; cursor: pointer; transition: 0.3s; color: #8b949e; margin: 2px 10px; border-radius: 12px;
-        }
-        .nav-link:hover, .nav-link.active { background: rgba(168, 85, 247, 0.1); color: var(--accent); }
-
-        /* --- WINDOWS 11: MAIN DESKTOP --- */
-        .main-desktop { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        /* Tepa qismdagi kichik logotip */
+        .app-header .ng-logo-icon { width: 35px; height: 35px; font-size: 18px; border-radius: 8px; }
+        .app-header .ng-logo-text { font-size: 22px; }
         
-        /* MAGIC OS: STORIES BAR */
-        .stories-bar {
-            padding: 15px 20px; display: flex; gap: 15px; overflow-x: auto;
-            border-bottom: var(--border); background: rgba(0,0,0,0.2);
-        }
-        .stories-bar::-webkit-scrollbar { display: none; }
-        .story-circle {
-            min-width: 65px; height: 65px; border-radius: 50%; padding: 3px;
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            cursor: pointer; transition: 0.3s;
-        }
-        .story-circle img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #0d1117; }
-
-        /* INSTAGRAM FEED: SCROLLABLE AREA */
-        .feed-area {
-            flex: 1; overflow-y: auto; padding: 30px 20px; display: flex; flex-direction: column; align-items: center;
-            scroll-behavior: smooth;
-        }
-        .feed-area::-webkit-scrollbar { width: 5px; }
-        .feed-area::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
-
-        /* PROFESSIONAL POST CARD */
-        .insta-post {
-            width: 100%; max-width: 500px; background: var(--glass); backdrop-filter: var(--mica);
-            border: var(--border); border-radius: 20px; margin-bottom: 35px; overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4); animation: slideUp 0.5s ease;
-        }
-        .post-header { padding: 12px 15px; display: flex; align-items: center; gap: 12px; }
-        .post-media { width: 100%; background: #000; position: relative; }
-        .post-media img, .post-media video { width: 100%; display: block; max-height: 600px; object-fit: contain; }
-        
-        .post-footer { padding: 15px; }
-        .post-btns { display: flex; gap: 18px; font-size: 24px; margin-bottom: 10px; }
-        .post-btns i { cursor: pointer; transition: 0.2s; }
-        .post-btns i:hover { color: var(--accent); transform: scale(1.1); }
-        .likes-count { font-weight: 600; font-size: 14px; margin-bottom: 5px; display: block; }
-        
-        /* MAGIC OS: CONTROL CENTER (FLOATING BUTTONS) */
-        .fab-add {
-            position: fixed; bottom: 40px; right: 40px; width: 60px; height: 60px;
-            background: var(--accent); border-radius: 20px; display: flex; align-items: center;
-            justify-content: center; font-size: 24px; color: white; cursor: pointer;
-            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.4); transition: 0.3s; z-index: 1000;
-        }
-        .fab-add:hover { transform: scale(1.1) rotate(90deg); }
-
-        /* --- MOBILE ADAPTIVITY --- */
-        @media (max-width: 768px) {
-            .win-sidebar { position: fixed; bottom: 0; width: 100%; height: 70px; flex-direction: row; z-index: 2000; padding: 0; justify-content: space-around; }
-            .nav-link { flex-direction: column; gap: 5px; font-size: 10px; margin: 0; }
-            .nav-link i { font-size: 20px; }
-            .main-desktop { padding-bottom: 70px; }
-            .fab-add { bottom: 90px; right: 20px; width: 50px; height: 50px; }
-        }
-
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        /* Vizual tuzatishlar */
+        .story-circle { border: 2px solid #a855f7; padding: 2px; }
+        .win-btn i { margin-right: 8px; }
     </style>
 </head>
 <body>
 
-    <div id="auth-wall" style="position:fixed; inset:0; background:var(--win-bg); z-index:9999; display:flex; align-items:center; justify-content:center;">
-        <div style="background:var(--glass); backdrop-filter:var(--mica); padding:50px; border-radius:30px; border:var(--border); text-align:center; width:350px;">
-            <h1 style="color:var(--accent); font-size:40px; margin-bottom:10px;">NetChat</h1>
-            <p style="opacity:0.5; font-size:14px; margin-bottom:30px;">Professional Social OS</p>
-            <div id="auth-step-1">
-                <button onclick="osLogin()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Google bilan kirish</button>
+    <div id="auth-screen" class="auth-overlay" style="position:fixed; inset:0; background:#010409; z-index:10000; display:flex; align-items:center; justify-content:center;">
+        <div class="auth-card" style="background:rgba(22,27,34,0.7); backdrop-filter:blur(30px); padding:40px; border-radius:24px; border:1px solid rgba(255,255,255,0.1); text-align:center; width:90%; max-width:400px;">
+            
+            <a href="#" class="ng-logo">
+                <div class="ng-logo-icon">N</div>
+                <div class="ng-logo-text">Net<span>Global</span> OS</div>
+            </a>
+
+            <div id="login-ui">
+                <p style="color:#94a3b8; margin-bottom: 30px; font-size:14px;">Professional ijtimoiy operatsion tizim</p>
+                <button class="win-btn" id="btnLoginGoogle" style="width:100%; padding:15px; border-radius:12px; border:none; background:#a855f7; color:white; font-weight:600; cursor:pointer;">
+                    <i class="fab fa-google"></i> Google Identity
+                </button>
             </div>
-            <div id="auth-step-2" style="display:none;">
-                <input type="text" id="os-username" placeholder="@username" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; background:rgba(0,0,0,0.5); border:var(--border); color:white;">
-                <button onclick="osComplete()" style="width:100%; padding:15px; border-radius:15px; border:none; background:var(--accent); color:white; font-weight:bold; cursor:pointer;">Tizimni yaratish</button>
+
+            <div id="reg-ui" style="display:none; text-align: left;">
+                <label style="font-size: 13px; color: #94a3b8; margin-left: 10px;">@username tanlang</label>
+                <input type="text" id="os-username-input" placeholder="@username" class="win-input" style="width:100%; padding:12px; margin-top:5px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:10px;">
+                <button class="win-btn" id="btnCompleteProfile" style="width:100%; padding:15px; border-radius:12px; border:none; background:#a855f7; color:white; font-weight:600; cursor:pointer; margin-top:15px;">
+                    Tizimni ishga tushirish
+                </button>
             </div>
         </div>
     </div>
 
-    <nav class="win-sidebar">
-        <div style="padding: 0 25px 30px; font-size: 22px; font-weight: bold; color: var(--accent);" class="d-mobile-hide">NetGlobal</div>
-        <div class="nav-link active"><i class="fas fa-home"></i> <span>Lenta</span></div>
-        <div class="nav-link"><i class="fas fa-search"></i> <span>Qidiruv</span></div>
-        <div class="nav-link"><i class="fas fa-compass"></i> <span>Explore</span></div>
-        <div class="nav-link"><i class="fas fa-play-circle"></i> <span>Reels</span></div>
-        <div class="nav-link"><i class="fas fa-paper-plane"></i> <span>Xabarlar</span></div>
-        <div class="nav-link"><i class="fas fa-heart"></i> <span>Bildirishnoma</span></div>
-        <div class="nav-link" id="my-profile-btn"><i class="fas fa-user-circle"></i> <span>Profil</span></div>
-    </nav>
+    <div class="app-window" id="main-os" style="display:none; height:100vh; flex-direction:column;">
+        <header class="app-header" style="padding:15px 25px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); background:rgba(2,6,23,0.5); backdrop-filter:blur(10px);">
+            
+            <a href="#" class="ng-logo">
+                <div class="ng-logo-icon">N</div>
+                <div class="ng-logo-text">Net<span>Global</span></div>
+            </a>
 
-    <main class="main-desktop">
-        <div class="stories-bar" id="stories-cont">
-            <div class="story-circle"><img src="https://via.placeholder.com/100" alt="Yaxshilik"></div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <b id="top-username-display" style="font-size: 14px; font-weight: 500;">@user</b>
+                <img id="top-avatar-img" src="https://via.placeholder.com/35" style="width:35px; height:35px; border-radius:50%; border:2px solid #a855f7;">
+            </div>
+        </header>
+
+        <div class="feed-scroll" id="feed-stream-cont" style="flex:1; overflow-y:auto; padding:30px 20px 100px 20px;">
             </div>
 
-        <div class="feed-area" id="insta-feed">
-            </div>
+        <nav class="win-dock" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:rgba(30,41,59,0.7); backdrop-filter:blur(30px); padding:10px 20px; border-radius:30px; display:flex; gap:25px; border:1px solid rgba(255,255,255,0.1); z-index:1000;">
+            <div class="dock-item active"><i class="fas fa-home"></i></div>
+            <div class="dock-item"><i class="fas fa-search"></i></div>
+            <div class="dock-item create-btn" id="btnOpenCompose" style="background:#a855f7; width:45px; height:45px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; cursor:pointer;"><i class="fas fa-plus"></i></div>
+            <div class="dock-item"><i class="fas fa-comment-alt"></i></div>
+            <div class="dock-item"><i class="fas fa-user"></i></div>
+        </nav>
+    </div>
 
-        <div class="fab-add" onclick="document.getElementById('os-upload').click()">
-            <i class="fas fa-plus"></i>
+    <div class="compose-overlay" id="compose-widget-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; z-index:2000;">
+        <div class="compose-card" style="background:rgba(30,41,59,0.9); padding:25px; border-radius:20px; width:90%; max-width:450px; border:1px solid rgba(255,255,255,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin:0; font-weight:600;">Yangi post</h3>
+                <i class="fas fa-times action-icon" id="btnCloseCompose" style="cursor:pointer; opacity:0.5;"></i>
+            </div>
+            
+            <textarea id="post-caption-input" placeholder="Nima gaplar? #NetGlobalOS" class="win-input" style="width:100%; height:100px; padding:12px; background:rgba(0,0,0,0.3); border:1px solid #334155; color:white; border-radius:10px; resize:none;"></textarea>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <label for="media-file-upload" class="win-btn" style="flex:1; background:rgba(255,255,255,0.1); color:white; text-align:center; padding:12px; border-radius:10px; cursor:pointer;">
+                    <i class="fas fa-image"></i> Rasm/Video
+                </label>
+                <input type="file" id="media-file-upload" hidden>
+                <button class="win-btn" id="btnPublishPost" style="flex:1; padding:12px; border-radius:10px; border:none; background:#a855f7; color:white; font-weight:600;">
+                    <i class="fas fa-paper-plane"></i> Ulashish
+                </button>
+            </div>
         </div>
-        <input type="file" id="os-upload" hidden onchange="uploadToInsta(this)">
-    </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -151,112 +132,11 @@
             messagingSenderId: "145404562699",
             appId: "1:145404562699:web:5eeb4c6abc3e18675b660e"
         };
+        // Firebase-ni ishga tushirish (boshqa JS fayllardan avval)
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const auth = firebase.auth();
-        const st = firebase.storage();
-
-        let currentUser = null;
-
-        // AUTH LOGIC
-        function osLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).then(res => {
-                db.ref('users/' + res.user.uid).once('value', snap => {
-                    if(snap.exists()) { currentUser = snap.val(); startOS(); }
-                    else { 
-                        document.getElementById('auth-step-1').style.display='none';
-                        document.getElementById('auth-step-2').style.display='block';
-                    }
-                });
-            });
-        }
-
-        function osComplete() {
-            const u = auth.currentUser;
-            const uname = document.getElementById('os-username').value.trim();
-            if(!uname) return alert("Username kiriting!");
-            currentUser = {
-                uid: u.uid, name: u.displayName,
-                username: uname.startsWith('@') ? uname : '@' + uname,
-                avatar: u.photoURL, bio: "NetGlobal User"
-            };
-            db.ref('users/' + u.uid).set(currentUser).then(startOS);
-        }
-
-        function startOS() {
-            document.getElementById('auth-wall').style.display='none';
-            loadInstaFeed();
-            loadStories();
-        }
-
-        // INSTAGRAM FUNCTIONS: POSTS
-        function uploadToInsta(input) {
-            const file = input.files[0];
-            if(!file) return;
-            const ref = st.ref(`insta_pro/${Date.now()}_${file.name}`);
-            ref.put(file).then(s => s.ref.getDownloadURL()).then(url => {
-                const type = file.type.startsWith('image/') ? 'img' : 'vid';
-                db.ref('insta_posts').push({
-                    uid: currentUser.uid,
-                    username: currentUser.username,
-                    avatar: currentUser.avatar,
-                    content: url,
-                    type: type,
-                    likes: 0,
-                    caption: "Yangi post #NetGlobal",
-                    time: Date.now()
-                });
-            });
-        }
-
-        function loadInstaFeed() {
-            db.ref('insta_posts').on('child_added', snap => {
-                const p = snap.val();
-                const media = p.type === 'img' ? `<img src="${p.content}">` : `<video controls src="${p.content}"></video>`;
-                
-                const postHTML = `
-                    <div class="insta-post" id="${snap.key}">
-                        <div class="post-header">
-                            <img src="${p.avatar}" style="width:32px; height:32px; border-radius:50%;">
-                            <b style="font-size:14px;">${p.username}</b>
-                            <i class="fas fa-ellipsis-h" style="margin-left:auto; opacity:0.5;"></i>
-                        </div>
-                        <div class="post-media">${media}</div>
-                        <div class="post-footer">
-                            <div class="post-btns">
-                                <i class="far fa-heart" onclick="likePost('${snap.key}', this)"></i>
-                                <i class="far fa-comment"></i>
-                                <i class="far fa-paper-plane"></i>
-                                <i class="far fa-bookmark" style="margin-left:auto;"></i>
-                            </div>
-                            <span class="likes-count">${p.likes} likes</span>
-                            <div style="font-size:14px;"><b>${p.username}</b> ${p.caption}</div>
-                            <div style="font-size:11px; opacity:0.4; margin-top:8px;">${new Date(p.time).toLocaleString()}</div>
-                        </div>
-                    </div>`;
-                const feed = document.getElementById('insta-feed');
-                feed.innerHTML = postHTML + feed.innerHTML;
-            });
-        }
-
-        function likePost(id, el) {
-            el.classList.toggle('fas');
-            el.classList.toggle('far');
-            el.style.color = el.classList.contains('fas') ? '#ed4956' : '';
-            // Realtime DB dagi like sonini oshirish mantiqi shu yerda bo'ladi
-        }
-
-        function loadStories() {
-            db.ref('users').limitToLast(10).once('value', snap => {
-                const cont = document.getElementById('stories-cont');
-                snap.forEach(u => {
-                    const user = u.val();
-                    cont.innerHTML += `<div class="story-circle"><img src="${user.avatar}" title="${user.username}"></div>`;
-                });
-            });
-        }
     </script>
+
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 </body>
 </html>
