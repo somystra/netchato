@@ -1,59 +1,133 @@
-/* WINDOWS 11 & MAGIC OS DESIGN SYSTEM */
+/* --- GLOBAL RESET --- */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-    --win-bg: #010409;
+    --bg: #000000;
+    --win-glass: rgba(22, 27, 34, 0.7);
     --accent: #a855f7;
-    --accent-hover: #c084fc;
-    --glass: rgba(22, 27, 34, 0.72);
-    --border: 1px solid rgba(255, 255, 255, 0.08);
-    --mica: blur(40px) saturate(180%);
-    --text-main: #f0f6fc;
-    --text-sub: #8b949e;
+    --border: 1px solid rgba(255, 255, 255, 0.1);
+    --text: #f5f5f5;
+    --text-dim: #a0a0a0;
 }
 
-body { 
-    margin: 0; font-family: 'Segoe UI Variable', system-ui, sans-serif; 
-    background: radial-gradient(circle at 50% 0%, #1e1b4b, #0d1117);
-    color: var(--text-main); height: 100vh; overflow: hidden; display: flex;
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: radial-gradient(circle at 50% 0%, #1a1033, #000000);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* SIDEBAR (WIN11 NAVIGATION) */
+/* --- AUTH SCREEN --- */
+.win-lock-screen {
+    position: fixed; inset: 0; z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    background: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1920') center/cover;
+}
+.auth-card {
+    background: var(--win-glass); backdrop-filter: blur(25px);
+    padding: 50px; border-radius: 28px; border: var(--border);
+    text-align: center; width: 400px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+.ng-logo-large .logo-box {
+    width: 70px; height: 70px; background: var(--accent); margin: 0 auto 15px;
+    border-radius: 18px; display: flex; align-items: center; justify-content: center;
+    font-size: 35px; font-weight: bold; color: white;
+}
+.ng-logo-large h1 { font-size: 32px; margin-bottom: 20px; }
+.ng-logo-large span { color: var(--accent); }
+
+/* --- BUTTONS & INPUTS --- */
+.win-prime-btn {
+    background: var(--accent); color: white; border: none; width: 100%;
+    padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer;
+    transition: 0.3s; font-size: 16px;
+}
+.win-prime-btn:hover { background: #c084fc; transform: translateY(-2px); }
+.win-input {
+    width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: var(--border);
+    border-radius: 12px; color: white; margin-bottom: 15px; outline: none;
+}
+
+/* --- MAIN LAYOUT --- */
+.app-container { display: flex; height: 100vh; width: 100vw; }
+
+/* SIDEBAR */
 .win-sidebar {
-    width: 260px; background: var(--glass); backdrop-filter: var(--mica);
-    border-right: var(--border); display: flex; flex-direction: column; padding: 20px 0;
-    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 250px; height: 100%; border-right: var(--border);
+    background: var(--win-glass); backdrop-filter: blur(20px);
+    display: flex; flex-direction: column; padding: 25px 15px;
 }
-
-.nav-link {
-    padding: 12px 20px; display: flex; align-items: center; gap: 15px;
-    font-size: 15px; cursor: pointer; transition: 0.2s; color: var(--text-sub); 
-    margin: 4px 12px; border-radius: 8px;
+.sidebar-header { display: flex; align-items: center; gap: 12px; padding: 10px 15px 40px; }
+.logo-mini {
+    width: 32px; height: 32px; background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-weight: bold;
 }
+.logo-text { font-size: 20px; font-weight: 700; }
+.logo-text span { color: var(--accent); }
 
-.nav-link:hover, .nav-link.active { 
-    background: rgba(255, 255, 255, 0.05); color: var(--accent); 
-    box-shadow: inset 3px 0 0 var(--accent);
+.side-nav { flex: 1; }
+.nav-item {
+    display: flex; align-items: center; gap: 18px; padding: 14px 18px;
+    border-radius: 12px; cursor: pointer; transition: 0.2s; color: var(--text-dim);
+    margin-bottom: 5px;
 }
+.nav-item i { font-size: 20px; width: 25px; }
+.nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.05); color: var(--accent); }
+.nav-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
 
-/* INSTAGRAM FEED & POSTS */
+/* CONTENT AREA */
+.content-wrapper { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding-top: 30px; }
+
+/* STORIES */
+.stories-container {
+    width: 100%; max-width: 630px; display: flex; gap: 18px; padding: 10px 0 25px;
+    overflow-x: auto; scrollbar-width: none;
+}
+.story-item { text-align: center; cursor: pointer; min-width: 75px; }
+.story-ring {
+    width: 66px; height: 66px; border-radius: 50%; padding: 3px;
+    background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+}
+.story-ring img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #000; }
+.story-item span { font-size: 11px; color: var(--text-dim); margin-top: 5px; display: block; }
+
+/* FEED POSTS */
+.insta-feed { width: 100%; max-width: 470px; padding-bottom: 50px; }
 .insta-post {
-    width: 100%; max-width: 480px; background: var(--glass); 
-    backdrop-filter: var(--mica); border: var(--border); 
-    border-radius: 12px; margin-bottom: 25px; overflow: hidden;
-    animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: var(--win-glass); border: var(--border); border-radius: 12px;
+    margin-bottom: 25px; overflow: hidden;
 }
+.post-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
+.post-media img, .post-media video { width: 100%; display: block; max-height: 580px; object-fit: cover; }
+.post-footer { padding: 12px 15px; }
+.post-actions { display: flex; gap: 18px; font-size: 22px; margin-bottom: 10px; }
+.post-actions i { cursor: pointer; transition: 0.2s; }
+.post-actions i:hover { color: var(--accent); }
 
-.post-media img, .post-media video { 
-    width: 100%; border-radius: 4px; border: 1px solid rgba(255,255,255,0.03);
+/* MODAL */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+    z-index: 10001; display: none; align-items: center; justify-content: center;
 }
-
-/* MAGIC OS ANIMATIONS */
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(40px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+.modal-card {
+    background: #1c1c1c; border-radius: 20px; width: 450px; border: var(--border); overflow: hidden;
 }
+.modal-header { padding: 15px 20px; display: flex; justify-content: space-between; border-bottom: var(--border); }
+.modal-body { padding: 20px; }
+.modal-body textarea {
+    width: 100%; height: 120px; background: transparent; border: none; color: white;
+    font-size: 16px; outline: none; resize: none;
+}
+.upload-zone {
+    border: 2px dashed rgba(255,255,255,0.1); border-radius: 12px; padding: 30px;
+    text-align: center; margin: 20px 0; cursor: pointer;
+}
+.upload-zone i { font-size: 30px; color: var(--accent); margin-bottom: 10px; }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .win-sidebar { width: 100%; height: 65px; position: fixed; bottom: 0; flex-direction: row; }
-    .nav-link span { display: none; }
+    .win-sidebar { width: 100%; height: 60px; position: fixed; bottom: 0; flex-direction: row; border-right: none; border-top: var(--border); }
+    .sidebar-header, .nav-item span, .sidebar-footer { display: none; }
+    .nav-item { padding: 10px; }
+    .content-wrapper { padding-bottom: 80px; }
 }
